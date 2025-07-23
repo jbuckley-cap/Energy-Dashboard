@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Energy Market Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #3949ab 50%, #1e88e5 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .last-updated {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .api-status {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            font-size: 0.85em;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-weight: 500;
+            color: white;
+        }
+
+        .control-group input, .control-group select {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            font-size: 14px;
+        }
+
+        .control-group select {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        .control-group select option {
+            background: #2c3e50;
+            color: white;
+            padding: 8px;
+        }
+
+        .control-group input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .market-summary {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .summary-title {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+
+        .news-section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .news-item {
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            border-left: 3px solid #00d4aa;
+            transition: all 0.3s ease;
+        }
+
+        .news-item:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+
+        .news-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+            line-height: 1.3;
+        }
+
+        .news-source {
+            font-size: 0.8em;
+            opacity: 0.7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .news-link {
+            color: #00d4aa;
+            text-decoration: none;
+            font-size: 0.8em;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .commodities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .companies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .price-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .commodity-card {
+            padding: 30px;
+            min-height: 220px;
+        }
+
+        .company-card {
+            padding: 20px;
+            min-height: 180px;
+        }
+
+        .price-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .price-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b35, #f7931e, #ffd700);
+        }
+
+        .company-card::before {
+            height: 3px;
+            background: linear-gradient(90deg, #00d4aa, #00a8ff);
+        }
+
+        .services-card::before {
+            height: 3px;
+            background: linear-gradient(90deg, #ff6b6b, #ee5a24);
+        }
+
+        .symbol {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .company-card .symbol {
+            font-size: 1.2em;
+        }
+
+        .company-name {
+            font-size: 0.85em;
+            opacity: 0.8;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+
+        .price {
+            font-size: 2.2em;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .company-card .price {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .change {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .change-amount {
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .change-percent {
+            font-size: 0.9em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .positive {
+            color: #00ff88;
+        }
+
+        .negative {
+            color: #ff4757;
+        }
+
+        .positive .change-percent {
+            background: rgba(0, 255, 136, 0.2);
+        }
+
+        .negative .change-percent {
+            background: rgba(255, 71, 87, 0.2);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        .status-live {
+            background: #00ff88;
+            animation: pulse 2s infinite;
+        }
+
+        .status-error {
+            background: #ff4757;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .price-chart {
+            height: 60px;
+            margin-top: 15px;
+            position: relative;
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        .company-card .price-chart {
+            height: 45px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .price-line {
+            fill: none;
+            stroke: #00d4aa;
+            stroke-width: 2;
+            filter: drop-shadow(0 0 3px rgba(0, 212, 170, 0.3));
+        }
+
+        .commodity-chart .price-line {
+            stroke: #ffd700;
+            filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.3));
+        }
+
+        .services-chart .price-line {
+            stroke: #ff6b6b;
+            filter: drop-shadow(0 0 3px rgba(255, 107, 107, 0.3));
+        }
+
+        .chart-area {
+            fill: url(#gradient);
+            opacity: 0.3;
+        }
+
+        .commodity-chart .chart-area {
+            fill: url(#commodityGradient);
+        }
+
+        .services-chart .chart-area {
+            fill: url(#servicesGradient);
+        }
+
+        .debug-panel {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 0.8em;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .debug-title {
+            color: #00d4aa;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .api-stats {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+
+        .deployment-info {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⛽ Energy Market Dashboard</h1>
+            <div class="last-updated">Last updated: <span id="lastUpdate">Initializing...</span></div>
+            <div class="api-status">
+                📡 <strong>Status:</strong> <span id="apiStatus">Connecting to live data sources...</span>
+            </div>
+            <div class="deployment-info">
+                🚀 <strong>Production Ready:</strong> This dashboard will display live data when deployed to a web server. 
+                APIs configured: Yahoo Finance, Finnhub, Polygon, NewsAPI.
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>Add Symbol:</label>
+                <input type="text" id="symbolInput" placeholder="e.g., XOM, NG=F" maxlength="10">
+                <button class="btn" onclick="addSymbol()">Add</button>
+            </div>
+            <div class="control-group">
+                <label>Refresh Rate:</label>
+                <select id="refreshRate" onchange="updateRefreshRate()">
+                    <option value="60000">1 minute</option>
+                    <option value="180000">3 minutes</option>
+                    <option value="300000" selected>5 minutes</option>
+                    <option value="600000">10 minutes</option>
+                    <option value="900000">15 minutes</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <button class="btn" onclick="toggleUpdates()" id="toggleBtn">⏸️ Pause</button>
+                <button class="btn" onclick="refreshPrices()">🔄 Refresh Now</button>
+                <button class="btn" onclick="toggleDebug()">🔍 Debug</button>
+            </div>
+        </div>
+
+        <!-- Debug Panel -->
+        <div id="debugPanel" class="debug-panel" style="display: none;">
+            <div class="debug-title">🔍 Live API Debug Information</div>
+            <div class="api-stats" id="apiStats">
+                <strong>Multi-API Performance:</strong><br>
+                • Yahoo Finance: <span id="yahooStats">Not tested</span><br>
+                • Finnhub: <span id="finnhubStats">Not tested</span><br>
+                • Polygon: <span id="polygonStats">Not tested</span><br>
+                • NewsAPI: <span id="newsApiStats">Not tested</span>
+            </div>
+            <div id="debugLog"></div>
+        </div>
+
+        <!-- Market Summary Section -->
+        <div class="market-summary">
+            <h2 style="text-align: center; margin-bottom: 20px;">📊 Market Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-title">Energy Sector Avg</div>
+                    <div class="summary-value" id="energySector">Loading...</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-title">Commodities Avg</div>
+                    <div class="summary-value" id="commoditiesAvg">Loading...</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-title">Top Gainer</div>
+                    <div class="summary-value" id="topGainer">Loading...</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-title">Top Loser</div>
+                    <div class="summary-value" id="topLoser">Loading...</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-title">Oil-Gas Correlation</div>
+                    <div class="summary-value" id="correlation">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- News Section -->
+        <div class="news-section">
+            <h2 style="text-align: center; margin-bottom: 20px;">📰 Energy News Headlines</h2>
+            <div id="newsStatus" style="text-align: center; margin-bottom: 15px; opacity: 0.8;">Loading targeted energy news...</div>
+            <div id="newsContainer" class="news-grid">
+                <div class="loading">Fetching latest energy industry news...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">🛢️ Energy Commodities</h2>
+            <div id="commoditiesGrid" class="commodities-grid">
+                <div class="loading">Loading live commodity data...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">🏭 Energy Companies</h2>
+            <div id="companiesGrid" class="companies-grid">
+                <div class="loading">Loading live company data...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">🔧 Oil Services</h2>
+            <div id="servicesGrid" class="companies-grid">
+                <div class="loading">Loading live oil services data...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============= API CONFIGURATION =============
+        const API_KEYS = {
+            FINNHUB: 'd20i9lpr01qrk6cl5adgd20i9lpr01qrk6cl5ae0',
+            POLYGON: 'M6qDtP6faizuLBGsbaOpoq3apRrVCe6h',
+            NEWSAPI: '93bf6f9fb8444a29892b3c0da9d25fbb'
+        };
+        
+        // Energy symbols organized by category
+        const commodities = ['CL=F', 'NG=F', 'BZ=F'];
+        const companies = ['XOM', 'CVX', 'COP', 'EOG', 'EQT', 'KMI', 'EPD', 'ET', 'WMB', 'VLO', 'PSX', 'MPC'];
+        const services = ['SLB', 'HAL', 'BKR'];
+        let allSymbols = [...commodities, ...companies, ...services];
+        
+        // Global state
+        let refreshInterval;
+        let newsInterval;
+        let isUpdating = true;
+        let priceHistory = {};
+        let priceData = {};
+        let debugMode = false;
+        let debugLog = [];
+        let apiStats = {
+            yahoo: { success: 0, failed: 0, lastTry: null },
+            finnhub: { success: 0, failed: 0, lastTry: null },
+            polygon: { success: 0, failed: 0, lastTry: null },
+            newsapi: { success: 0, failed: 0, lastTry: null }
+        };
+
+        // Initialize price history
+        allSymbols.forEach(symbol => {
+            priceHistory[symbol] = [];
+        });
+
+        // ============= DEBUG FUNCTIONS =============
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            console.log(logEntry);
+            debugLog.push(logEntry);
+            if (debugLog.length > 100) debugLog.shift();
+            updateDebugDisplay();
+        }
+
+        function updateDebugDisplay() {
+            if (debugMode) {
+                const debugLogElement = document.getElementById('debugLog');
+                if (debugLogElement) {
+                    debugLogElement.innerHTML = debugLog.slice(-25).join('<br>');
+                    debugLogElement.scrollTop = debugLogElement.scrollHeight;
+                }
+            }
+        }
+
+        function updateApiStats() {
+            document.getElementById('yahooStats').innerHTML = 
+                `${apiStats.yahoo.success} success, ${apiStats.yahoo.failed} failed`;
+            document.getElementById('finnhubStats').innerHTML = 
+                `${apiStats.finnhub.success} success, ${apiStats.finnhub.failed} failed`;
+            document.getElementById('polygonStats').innerHTML = 
+                `${apiStats.polygon.success} success, ${apiStats.polygon.failed} failed`;
+            document.getElementById('newsApiStats').innerHTML = 
+                `${apiStats.newsapi.success} success, ${apiStats.newsapi.failed} failed`;
+        }
+
+        function toggleDebug() {
+            debugMode = !debugMode;
+            const panel = document.getElementById('debugPanel');
+            panel.style.display = debugMode ? 'block' : 'none';
+            updateDebugDisplay();
+            updateApiStats();
+        }
+
+        function updateStatus(message) {
+            document.getElementById('apiStatus').textContent = message;
+            log(message);
+        }
+
+        // ============= SYMBOL CONVERSION =============
+        function convertSymbolForFinnhub(symbol) {
+            if (symbol.includes('=F')) {
+                return symbol.replace('=F', '_F'); // CL=F → CL_F
+            }
+            return symbol;
+        }
+
+        function convertSymbolForPolygon(symbol) {
+            if (symbol.includes('=F')) {
+                return symbol.replace('=F', ''); // CL=F → CL (simplified)
+            }
+            return symbol;
+        }
+
+        // ============= PRICE DATA FUNCTIONS =============
+        function getBasePrices() {
+            return {
+                'CL=F': 65.31, 'NG=F': 3.28, 'BZ=F': 69.85,
+                'XOM': 109.48, 'CVX': 150.04, 'COP': 107.25, 'EOG': 121.30, 'EQT': 39.85,
+                'KMI': 27.84, 'EPD': 31.18, 'ET': 16.95, 'WMB': 57.82,
+                'VLO': 131.75, 'PSX': 115.20, 'MPC': 148.60,
+                'SLB': 42.50, 'HAL': 32.75, 'BKR': 34.20
+            };
+        }
+
+        function getAssetName(symbol) {
+            const names = {
+                'CL=F': 'WTI Crude Oil Futures', 'NG=F': 'Natural Gas Futures', 'BZ=F': 'Brent Crude Oil Futures',
+                'XOM': 'Exxon Mobil Corporation', 'CVX': 'Chevron Corporation', 'COP': 'ConocoPhillips',
+                'EOG': 'EOG Resources, Inc.', 'EQT': 'EQT Corporation', 'KMI': 'Kinder Morgan, Inc.',
+                'EPD': 'Enterprise Products Partners', 'ET': 'Energy Transfer LP', 'WMB': 'The Williams Companies, Inc.',
+                'VLO': 'Valero Energy Corporation', 'PSX': 'Phillips 66', 'MPC': 'Marathon Petroleum Corporation',
+                'SLB': 'Schlumberger Limited', 'HAL': 'Halliburton Company', 'BKR': 'Baker Hughes Company'
+            };
+            return names[symbol] || symbol;
+        }
+
+        function generateRealisticPrice(symbol, lastPrice = null) {
+            const basePrices = getBasePrices();
+            const basePrice = lastPrice || basePrices[symbol] || 100;
+            
+            // Create realistic market movements with trends
+            const volatility = symbol.includes('=F') ? 0.015 : 0.010;
+            const trend = Math.sin(Date.now() / 200000) * 0.003;
+            const random = (Math.random() - 0.5) * 2 * volatility;
+            const change = trend + random;
+            
+            const newPrice = Math.max(0.01, basePrice * (1 + change));
+            const priceChange = newPrice - basePrice;
+            const percentChange = (priceChange / basePrice) * 100;
+            
+            return {
+                price: newPrice,
+                change: priceChange,
+                changePercent: percentChange,
+                isLive: false
+            };
+        }
+
+        // ============= YAHOO FINANCE API =============
+        async function fetchFromYahoo(symbol) {
+            try {
+                const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
+                
+                log(`🔄 Yahoo: Fetching ${symbol}`);
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.quoteResponse && data.quoteResponse.result && data.quoteResponse.result.length > 0) {
+                    const quote = data.quoteResponse.result[0];
+                    
+                    const currentPrice = quote.regularMarketPrice || quote.bid || quote.ask;
+                    const change = quote.regularMarketChange || 0;
+                    const changePercent = quote.regularMarketChangePercent || 0;
+                    
+                    if (currentPrice && currentPrice > 0) {
+                        apiStats.yahoo.success++;
+                        log(`✅ Yahoo: ${symbol} = $${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
+                        
+                        return {
+                            price: currentPrice,
+                            change: change,
+                            changePercent: changePercent,
+                            isLive: true,
+                            source: 'Yahoo'
+                        };
+                    } else {
+                        throw new Error('Invalid price data');
+                    }
+                } else {
+                    throw new Error('No quote data in response');
+                }
+            } catch (error) {
+                apiStats.yahoo.failed++;
+                log(`❌ Yahoo: ${symbol} failed - ${error.message}`);
+                return null;
+            }
+        }
+
+        // ============= FINNHUB API =============
+        async function fetchFromFinnhub(symbol) {
+            try {
+                const convertedSymbol = convertSymbolForFinnhub(symbol);
+                const url = `https://finnhub.io/api/v1/quote?symbol=${convertedSymbol}&token=${API_KEYS.FINNHUB}`;
+                
+                log(`🔄 Finnhub: Fetching ${symbol} (${convertedSymbol})`);
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.c && data.c > 0) {
+                    const change = data.d || 0;
+                    const changePercent = data.dp || 0;
+                    
+                    apiStats.finnhub.success++;
+                    log(`✅ Finnhub: ${symbol} = $${data.c.toFixed(2)} (${changePercent.toFixed(2)}%)`);
+                    
+                    return {
+                        price: data.c,
+                        change: change,
+                        changePercent: changePercent,
+                        isLive: true,
+                        source: 'Finnhub'
+                    };
+                } else {
+                    throw new Error('Invalid data format');
+                }
+            } catch (error) {
+                apiStats.finnhub.failed++;
+                log(`❌ Finnhub: ${symbol} failed - ${error.message}`);
+                return null;
+            }
+        }
+
+        // ============= POLYGON API =============
+        async function fetchFromPolygon(symbol) {
+            try {
+                const convertedSymbol = convertSymbolForPolygon(symbol);
+                const url = `https://api.polygon.io/v2/aggs/ticker/${convertedSymbol}/prev?adjusted=true&apikey=${API_KEYS.POLYGON}`;
+                
+                log(`🔄 Polygon: Fetching ${symbol} (${convertedSymbol})`);
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.results && data.results.length > 0) {
+                    const result = data.results[0];
+                    const currentPrice = result.c;
+                    const openPrice = result.o;
+                    const change = currentPrice - openPrice;
+                    const changePercent = (change / openPrice) * 100;
+                    
+                    apiStats.polygon.success++;
+                    log(`✅ Polygon: ${symbol} = $${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
+                    
+                    return {
+                        price: currentPrice,
+                        change: change,
+                        changePercent: changePercent,
+                        isLive: true,
+                        source: 'Polygon'
+                    };
+                } else {
+                    throw new Error('No data in response');
+                }
+            } catch (error) {
+                apiStats.polygon.failed++;
+                log(`❌ Polygon: ${symbol} failed - ${error.message}`);
+                return null;
+            }
+        }
+
+        // ============= NEWS API =============
+        async function fetchLiveNews() {
+            log('📰 Fetching targeted energy news...');
+            updateNewsStatus('🔍 Searching for energy industry news...');
+            
+            try {
+                const queries = [
+                    '("Natural Gas" OR "Oil" OR "Petroleum" OR "Crude") AND ("pipeline" OR "infrastructure") AND ("litigation" OR "data center" OR "regulatory" OR "policy" OR "policies")',
+                    '("natural gas" OR "oil" OR "oil and gas" OR "oil & gas" OR "O&G") AND ("drilling" OR "wells" OR "wellheads" OR "exploration" OR "production" OR "E&P") AND ("regulations" OR "regulatory" OR "policy" OR "policies")'
+                ];
+                
+                const allNews = [];
+                
+                for (const query of queries) {
+                    try {
+                        const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&pageSize=10&language=en&apiKey=${API_KEYS.NEWSAPI}`;
+                        
+                        log(`🔍 NewsAPI: Searching with targeted query`);
+                        
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        
+                        const data = await response.json();
+                        
+                        if (data.articles && data.articles.length > 0) {
+                            allNews.push(...data.articles.slice(0, 5));
+                            log(`✅ NewsAPI: Found ${data.articles.length} articles`);
+                        }
+                    } catch (error) {
+                        log(`❌ NewsAPI query failed: ${error.message}`);
+                    }
+                }
+                
+                if (allNews.length > 0) {
+                    const newsItems = allNews.slice(0, 12).map(article => ({
+                        title: article.title,
+                        url: article.url,
+                        source: article.source.name,
+                        time: article.publishedAt
+                    }));
+                    
+                    displayNews(newsItems);
+                    updateNewsStatus(`✅ Loaded ${newsItems.length} targeted energy headlines`);
+                    apiStats.newsapi.success++;
+                    log(`✅ NewsAPI: Total articles loaded: ${newsItems.length}`);
+                } else {
+                    throw new Error('No news articles found');
+                }
+            } catch (error) {
+                apiStats.newsapi.failed++;
+                log(`❌ NewsAPI failed: ${error.message}`);
+                updateNewsStatus('❌ Live news unavailable - showing industry examples');
+                displayFallbackNews();
+            }
+        }
+
+        function displayNews(newsItems) {
+            const container = document.getElementById('newsContainer');
+            if (!container) return;
+            
+            const newsHtml = newsItems.map(item => `
+                <div class="news-item">
+                    <div class="news-title">${item.title}</div>
+                    <div class="news-source">
+                        <span>${item.source}</span>
+                        <a href="${item.url}" target="_blank" class="news-link">Read More</a>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = newsHtml;
+        }
+
+        function displayFallbackNews() {
+            const fallbackNews = [
+                { title: 'Federal Pipeline Infrastructure Regulations Face Legal Challenge from Energy Groups', source: 'Energy Policy Watch', url: 'https://example.com' },
+                { title: 'Natural Gas Drilling Operations in Permian Basin Under New Regulatory Scrutiny', source: 'Oil & Gas Journal', url: 'https://example.com' },
+                { title: 'Data Center Energy Demand Drives New Natural Gas Pipeline Projects', source: 'Infrastructure Today', url: 'https://example.com' },
+                { title: 'Oil and Gas E&P Companies Challenge State Environmental Policies in Court', source: 'Petroleum News', url: 'https://example.com' },
+                { title: 'Wellhead Safety Regulations Updated Following Industry Compliance Review', source: 'Drilling Contractor', url: 'https://example.com' },
+                { title: 'Crude Oil Pipeline Litigation Reaches Federal Appeals Court Level', source: 'Energy Legal News', url: 'https://example.com' }
+            ];
+            displayNews(fallbackNews);
+        }
+
+        function updateNewsStatus(message) {
+            const element = document.getElementById('newsStatus');
+            if (element) {
+                element.textContent = message;
+            }
+        }
+
+        // ============= CHART FUNCTIONS =============
+        function createPriceChart(symbol, chartType = 'company') {
+            const prices = priceHistory[symbol] || [];
+            if (prices.length < 2) return '<div class="chart-container">Building chart...</div>';
+            
+            const width = 100, height = 100;
+            const max = Math.max(...prices);
+            const min = Math.min(...prices);
+            const range = max - min || 1;
+            
+            const points = prices.map((price, index) => {
+                const x = (index / (prices.length - 1)) * width;
+                const y = height - ((price - min) / range) * height;
+                return `${x},${y}`;
+            }).join(' ');
+
+            const areaPoints = `0,${height} ${points} ${width},${height}`;
+            const chartClass = chartType === 'commodity' ? 'commodity-chart' : 
+                              chartType === 'services' ? 'services-chart' : '';
+            
+            return `
+                <div class="chart-container ${chartClass}">
+                    <svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#00d4aa;stop-opacity:0.6" />
+                                <stop offset="100%" style="stop-color:#00d4aa;stop-opacity:0" />
+                            </linearGradient>
+                            <linearGradient id="commodityGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#ffd700;stop-opacity:0.6" />
+                                <stop offset="100%" style="stop-color:#ffd700;stop-opacity:0" />
+                            </linearGradient>
+                            <linearGradient id="servicesGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:0.6" />
+                                <stop offset="100%" style="stop-color:#ff6b6b;stop-opacity:0" />
+                            </linearGradient>
+                        </defs>
+                        <polygon class="chart-area" points="${areaPoints}" />
+                        <polyline class="price-line" points="${points}" />
+                    </svg>
+                </div>
+            `;
+        }
+
+        // ============= DISPLAY FUNCTIONS =============
+        function formatPrice(price, symbol) {
+            if (symbol.includes('=F')) {
+                if (symbol === 'NG=F') return '$' + price.toFixed(3) + '/MMBtu';
+                else if (symbol === 'CL=F' || symbol === 'BZ=F') return '$' + price.toFixed(2) + '/bbl';
+            }
+            return '$' + price.toFixed(2);
+        }
+
+        function formatChange(change, changePercent) {
+            const changeStr = (change >= 0 ? '+' : '') + change.toFixed(2);
+            const percentStr = (changePercent >= 0 ? '+' : '') + changePercent.toFixed(2) + '%';
+            return { changeStr, percentStr };
+        }
+
+        function renderPriceCards(symbols, containerId, cardClass, chartType = 'company') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const html = symbols.map(symbol => {
+                const data = priceData[symbol];
+                if (!data) return '';
+                
+                const { changeStr, percentStr } = formatChange(data.change, data.changePercent);
+                const isPositive = data.change >= 0;
+                const statusClass = isUpdating ? (data.isLive ? 'status-live' : 'status-error') : 'status-error';
+                const dataSource = data.isLive ? `📡 ${data.source || 'LIVE'}` : '📊 SIM';
+                
+                return `
+                    <div class="price-card ${cardClass}">
+                        <div class="symbol">
+                            ${symbol} <span style="font-size: 0.7em; opacity: 0.7;">${dataSource}</span>
+                            <span class="status-indicator ${statusClass}"></span>
+                        </div>
+                        <div class="company-name">${data.name}</div>
+                        <div class="price">${formatPrice(data.price, symbol)}</div>
+                        <div class="change ${isPositive ? 'positive' : 'negative'}">
+                            <span class="change-amount">${changeStr}</span>
+                            <span class="change-percent">${percentStr}</span>
+                        </div>
+                        <div class="price-chart">${createPriceChart(symbol, chartType)}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        }
+
+        function updateMarketSummary() {
+            try {
+                const allData = Object.values(priceData).filter(d => d && typeof d.changePercent === 'number');
+                if (allData.length === 0) return;
+                
+                // Energy sector (companies + services)
+                const stockSymbols = [...companies, ...services];
+                const stockData = stockSymbols.map(s => priceData[s]).filter(d => d && typeof d.changePercent === 'number');
+                const energyAvg = stockData.length > 0 ? 
+                    stockData.reduce((sum, d) => sum + d.changePercent, 0) / stockData.length : 0;
+                
+                // Commodities average
+                const commodityData = commodities.map(s => priceData[s]).filter(d => d && typeof d.changePercent === 'number');
+                const commoditiesAvg = commodityData.length > 0 ? 
+                    commodityData.reduce((sum, d) => sum + d.changePercent, 0) / commodityData.length : 0;
+                
+                // Top gainer and loser
+                const topGainer = allData.reduce((max, d) => d.changePercent > max.changePercent ? d : max, allData[0]);
+                const topLoser = allData.reduce((min, d) => d.changePercent < min.changePercent ? d : min, allData[0]);
+                
+                // Oil-Gas correlation
+                const oilData = priceData['CL=F'];
+                const gasData = priceData['NG=F'];
+                let correlation = 'N/A';
+                if (oilData && gasData && typeof oilData.changePercent === 'number' && typeof gasData.changePercent === 'number') {
+                    correlation = (oilData.changePercent * gasData.changePercent > 0) ? 'Positive' : 'Negative';
+                }
+                
+                // Update display
+                document.getElementById('energySector').innerHTML = `<span class="${energyAvg >= 0 ? 'positive' : 'negative'}">${energyAvg.toFixed(2)}%</span>`;
+                document.getElementById('commoditiesAvg').innerHTML = `<span class="${commoditiesAvg >= 0 ? 'positive' : 'negative'}">${commoditiesAvg.toFixed(2)}%</span>`;
+                document.getElementById('topGainer').innerHTML = `<span class="positive">${topGainer.symbol} ${topGainer.changePercent.toFixed(2)}%</span>`;
+                document.getElementById('topLoser').innerHTML = `<span class="negative">${topLoser.symbol} ${topLoser.changePercent.toFixed(2)}%</span>`;
+                document.getElementById('correlation').textContent = correlation;
+            } catch (error) {
+                log(`❌ Error updating market summary: ${error.message}`);
+            }
+        }
+
+        // ============= MAIN PRICE FETCHING =============
+        async function fetchPrices() {
+            log('🚀 Starting multi-API data fetch...');
+            updateStatus('🔄 Fetching from Yahoo, Finnhub, Polygon APIs...');
+            
+            let liveDataCount = 0;
+            
+            // Try multiple APIs for each symbol
+            for (const symbol of allSymbols) {
+                let data = null;
+                
+                // Try Yahoo Finance first
+                data = await fetchFromYahoo(symbol);
+                
+                // If Yahoo fails, try Finnhub
+                if (!data) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    data = await fetchFromFinnhub(symbol);
+                }
+                
+                // If both fail, try Polygon (for stocks only)
+                if (!data && !symbol.includes('=F')) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    data = await fetchFromPolygon(symbol);
+                }
+                
+                if (data) {
+                    priceData[symbol] = {
+                        ...data,
+                        name: getAssetName(symbol),
+                        symbol: symbol
+                    };
+                    liveDataCount++;
+                } else {
+                    // Use realistic simulation for failed fetches
+                    const lastPrice = priceHistory[symbol] && priceHistory[symbol].length > 0 ? 
+                        priceHistory[symbol][priceHistory[symbol].length - 1] : null;
+                    const simulatedData = generateRealisticPrice(symbol, lastPrice);
+                    
+                    priceData[symbol] = {
+                        ...simulatedData,
+                        name: getAssetName(symbol),
+                        symbol: symbol
+                    };
+                }
+                
+                // Update price history
+                if (!priceHistory[symbol]) priceHistory[symbol] = [];
+                priceHistory[symbol].push(priceData[symbol].price);
+                if (priceHistory[symbol].length > 30) {
+                    priceHistory[symbol].shift();
+                }
+                
+                // Small delay between requests
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+            
+            // Update all displays
+            renderPriceCards(commodities, 'commoditiesGrid', 'commodity-card', 'commodity');
+            renderPriceCards(companies, 'companiesGrid', 'company-card', 'company');
+            renderPriceCards(services, 'servicesGrid', 'company-card services-card', 'services');
+            updateMarketSummary();
+            
+            const now = new Date().toLocaleTimeString();
+            document.getElementById('lastUpdate').textContent = now;
+            
+            const statusMessage = liveDataCount > 0 ? 
+                `✅ ${liveDataCount} live data points, ${allSymbols.length - liveDataCount} simulated` :
+                '📊 All simulated (live APIs unavailable in current environment)';
+            updateStatus(statusMessage);
+            
+            updateApiStats();
+            log(`✅ Data fetch complete: ${liveDataCount}/${allSymbols.length} live`);
+        }
+
+        // ============= CONTROL FUNCTIONS =============
+        function addSymbol() {
+            const input = document.getElementById('symbolInput');
+            const symbol = input.value.trim().toUpperCase();
+            
+            if (symbol && !allSymbols.includes(symbol)) {
+                if (symbol.includes('=F')) {
+                    commodities.push(symbol);
+                } else if (['SLB', 'HAL', 'BKR'].some(s => symbol.includes(s))) {
+                    services.push(symbol);
+                } else {
+                    companies.push(symbol);
+                }
+                allSymbols.push(symbol);
+                priceHistory[symbol] = [];
+                input.value = '';
+                fetchPrices();
+                log(`➕ Added symbol: ${symbol}`);
+            }
+        }
+
+        function updateRefreshRate() {
+            const rate = parseInt(document.getElementById('refreshRate').value);
+            clearInterval(refreshInterval);
+            if (isUpdating) {
+                refreshInterval = setInterval(fetchPrices, rate);
+            }
+            log(`⏱️ Refresh rate updated to ${rate/1000} seconds`);
+        }
+
+        function toggleUpdates() {
+            const btn = document.getElementById('toggleBtn');
+            isUpdating = !isUpdating;
+            
+            if (isUpdating) {
+                btn.textContent = '⏸️ Pause';
+                updateRefreshRate();
+                updateStatus('🔄 Live updates resumed');
+            } else {
+                btn.textContent = '▶️ Resume';
+                clearInterval(refreshInterval);
+                updateStatus('⏸️ Updates paused');
+            }
+            log(`${isUpdating ? '▶️ Resumed' : '⏸️ Paused'} updates`);
+        }
+
+        function refreshPrices() {
+            log('🔄 Manual refresh triggered');
+            fetchPrices();
+        }
+
+        // ============= INITIALIZATION =============
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Production Energy Market Dashboard starting...');
+            
+            // Set up event listeners
+            document.getElementById('symbolInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addSymbol();
+                }
+            });
+
+            // Start the application
+            updateStatus('🔌 Connecting to multiple data sources...');
+            
+            // Initial data load
+            fetchPrices();
+            fetchLiveNews();
+            
+            // Set up intervals
+            refreshInterval = setInterval(fetchPrices, 300000); // 5 minutes
+            newsInterval = setInterval(fetchLiveNews, 900000); // 15 minutes
+            
+            log('✅ Production dashboard ready for deployment');
+        });
+    </script>
+</body>
+</html>
