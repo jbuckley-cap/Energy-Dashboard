@@ -946,8 +946,72 @@
             MEDIASTACK: 'c2ddab844edc121d2d7d3c84f450ae9e'
         };
 
-        // CORS Proxy for Yahoo Finance fallback
-        const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+        // ============= FREE COMMODITY API =============
+        async function fetchFromCommodityAPI(symbol) {
+            try {
+                // This is a free commodity-specific endpoint
+                let commodity = '';
+                if (symbol === 'CL=F') commodity = 'WTIOIL';
+                else if (symbol === 'BZ=F') commodity = 'BRENTOIL';
+                else if (symbol === 'NG=F') commodity = 'NG';
+                else return null;
+                
+                // Using a free commodity price API endpoint
+                const url = `https://api.api-ninjas.com/v1/commodityprice?name=${commodity}`;
+                
+                log(`🔄 Commodity API: Fetching ${symbol} as ${commodity}`);
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'X-Api-Key': 'YOUR_API_KEY' // This would need a free API key from api-ninjas
+                    }
+                });
+                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.price) {
+                    const currentPrice = parseFloat(data.price);
+                    
+                    // Calculate change based on last known price or base price
+                    let change = 0;
+                    let changePercent = 0;
+                    
+                    const basePrice = getBasePrices()[symbol] || currentPrice;
+                    if (priceHistory[symbol] && priceHistory[symbol].length > 0) {
+                        const lastPrice = priceHistory[symbol][priceHistory[symbol].length - 1];
+                        change = currentPrice - lastPrice;
+                        changePercent = (change / lastPrice) * 100;
+                    } else {
+                        change = currentPrice - basePrice;
+                        changePercent = (change / basePrice) * 100;
+                    }
+                    
+                    log(`✅ Commodity API: ${symbol} = ${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
+                    
+                    return {
+                        price: currentPrice,
+                        change: change,
+                        changePercent: changePercent,
+                        isLive: true,
+                        source: 'CommodityAPI'
+                    };
+                } else {
+                    throw new Error('No price data');
+                }
+            } catch (error) {
+                log(`❌ Commodity API: ${symbol} failed - ${error.message}`);
+                return null;
+            }
+        }
+
+        // Add this after the CORS_PROXY declaration at the top
+        const ALTERNATE_PROXIES = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+            'https://proxy.cors.sh/'
+        ];
         
         // Energy symbols organized by category
         const commodities = ['CL=F', 'NG=F', 'BZ=F'];
@@ -1441,32 +1505,112 @@
                     return null;
                 }
                 
-                // Convert symbol format
+                // Try different symbol formats for commodities
                 let tdSymbol = symbol;
-                if (symbol === 'CL=F') tdSymbol = 'CL';
-                else if (symbol === 'NG=F') tdSymbol = 'NG';
-                else if (symbol === 'BZ=F') tdSymbol = 'BZ';
+                let isCommodity = false;
                 
-                const url = `https://api.twelvedata.com/quote?symbol=${tdSymbol}&apikey=${API_KEYS.TWELVEDATA}`;
+                // Multiple format attempts for commodities
+                const commodityFormats = {
+                    'CL=F': ['CL1:NYMEX', 'CL', 'CRUDE_OIL', 'WTI'],
+                    'NG=F': ['NG1:NYMEX', 'NG', 'NATURAL_GAS', 'NATGAS'],
+                    'BZ=F': ['BZ1:NYMEX', 'BZ', 'BRENT', 'BRENT_OIL']
+                };
                 
-                log(`🔄 TwelveData: Fetching ${symbol} (${tdSymbol})`);
+                if (commodityFormats[symbol]) {
+                    isCommodity = true;
+                    
+                    // Try each format
+                    for (const format of commodityFormats[symbol]) {
+                        try {
+                            const url = `https://api.twelvedata.com/price?symbol=${format}&apikey=${API_KEYS.TWELVEDATA}`;
+                            
+                            log(`🔄 TwelveData: Trying ${symbol} as ${format}`);
+                            
+                            const response = await fetch(url);
+                            if (!response.ok) continue;
+                            
+                            const data = await response.json();
+                            
+                            log(`TwelveData response for ${format}: ${JSON.stringify(data)}`);
+                            
+                            if (data.price && !data.code) {
+                                const currentPrice = parseFloat(data.price);
+                                
+                                // Calculate change based on last known price
+                                let change = 0;
+                                let changePercent = 0;
+                                
+                                if (priceHistory[symbol] && priceHistory[symbol].length > 0) {
+                                    const lastPrice = priceHistory[symbol][priceHistory[symbol].length - 1];
+                                    change = currentPrice - lastPrice;
+                                    changePercent = (change / lastPrice) * 100;
+                                } else {
+                                    const basePrice = getBasePrices()[symbol] || currentPrice;
+                                    change = currentPrice - basePrice;
+                                    changePercent = (change / basePrice) * 100;
+                                }
+                                
+                                apiStats.twelvedata.success++;
+                                apiUsage.twelvedata.count++;
+                                updateApiUsageDisplay();
+                                
+                                log(`✅ TwelveData: ${symbol} = ${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
+                                
+                                return {
+                                    price: currentPrice,
+                                    change: change,
+                                    changePercent: changePercent,
+                                    isLive: true,
+                                    source: 'TwelveData'
+                                };
+                            }
+                        } catch (err) {
+                            log(`❌ TwelveData format ${format} failed: ${err.message}`);
+                            continue;
+                        }
+                    }
+                    
+                    throw new Error('All commodity formats failed');
+                } else {
+                    // Regular stock symbol
+                    tdSymbol = symbol;
+                }
+                
+                const url = `https://api.twelvedata.com/price?symbol=${tdSymbol}&apikey=${API_KEYS.TWELVEDATA}`;
+                
+                log(`🔄 TwelveData: Fetching ${symbol} as ${tdSymbol}`);
                 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 
                 const data = await response.json();
                 
-                if (data.price && !data.code) {
+                log(`TwelveData response for ${symbol}: ${JSON.stringify(data)}`);
+                
+                // Handle different response formats
+                if (data.price) {
                     const currentPrice = parseFloat(data.price);
-                    const previousClose = parseFloat(data.previous_close) || currentPrice;
-                    const change = currentPrice - previousClose;
-                    const changePercent = (change / previousClose) * 100;
+                    
+                    // For commodities, we'll calculate change based on last known price
+                    let change = 0;
+                    let changePercent = 0;
+                    
+                    if (priceHistory[symbol] && priceHistory[symbol].length > 0) {
+                        const lastPrice = priceHistory[symbol][priceHistory[symbol].length - 1];
+                        change = currentPrice - lastPrice;
+                        changePercent = (change / lastPrice) * 100;
+                    } else {
+                        // Use base price for initial calculation
+                        const basePrice = getBasePrices()[symbol] || currentPrice;
+                        change = currentPrice - basePrice;
+                        changePercent = (change / basePrice) * 100;
+                    }
                     
                     apiStats.twelvedata.success++;
                     apiUsage.twelvedata.count++;
                     updateApiUsageDisplay();
                     
-                    log(`✅ TwelveData: ${symbol} = $${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
+                    log(`✅ TwelveData: ${symbol} = ${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
                     
                     return {
                         price: currentPrice,
@@ -1475,12 +1619,71 @@
                         isLive: true,
                         source: 'TwelveData'
                     };
+                } else if (data.code === 400 || data.status === 'error') {
+                    throw new Error(data.message || 'Symbol not found');
                 } else {
-                    throw new Error(data.message || 'Invalid data');
+                    throw new Error('Invalid response format');
                 }
             } catch (error) {
                 apiStats.twelvedata.failed++;
                 log(`❌ TwelveData: ${symbol} failed - ${error.message}`);
+                return null;
+            }
+        }
+
+        // ============= ALPHA VANTAGE COMMODITIES API =============
+        async function fetchFromAlphaVantage(symbol) {
+            try {
+                let avFunction = '';
+                let avSymbol = '';
+                
+                if (symbol === 'CL=F') {
+                    avFunction = 'WTI';
+                } else if (symbol === 'BZ=F') {
+                    avFunction = 'BRENT';
+                } else if (symbol === 'NG=F') {
+                    avFunction = 'NATURAL_GAS';
+                } else {
+                    return null; // Not a commodity
+                }
+                
+                const url = `https://www.alphavantage.co/query?function=${avFunction}&apikey=demo`;
+                
+                log(`🔄 AlphaVantage: Fetching ${symbol} as ${avFunction}`);
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.data && data.data.length > 0) {
+                    const latestData = data.data[0];
+                    const currentPrice = parseFloat(latestData.value);
+                    
+                    // Calculate change from previous day if available
+                    let change = 0;
+                    let changePercent = 0;
+                    
+                    if (data.data.length > 1) {
+                        const previousPrice = parseFloat(data.data[1].value);
+                        change = currentPrice - previousPrice;
+                        changePercent = (change / previousPrice) * 100;
+                    }
+                    
+                    log(`✅ AlphaVantage: ${symbol} = ${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
+                    
+                    return {
+                        price: currentPrice,
+                        change: change,
+                        changePercent: changePercent,
+                        isLive: true,
+                        source: 'AlphaVantage'
+                    };
+                } else {
+                    throw new Error('No data available');
+                }
+            } catch (error) {
+                log(`❌ AlphaVantage: ${symbol} failed - ${error.message}`);
                 return null;
             }
         }
@@ -1531,9 +1734,11 @@
                     return null;
                 }
                 
-                const url = `https://api.currentsapi.services/v1/latest-news?keywords=oil,gas,energy&language=en&apiKey=${API_KEYS.CURRENTS}`;
+                // More specific energy sector queries
+                const energyKeywords = 'oil%20prices%20OR%20natural%20gas%20OR%20crude%20oil%20OR%20energy%20sector%20OR%20petroleum%20OR%20OPEC%20OR%20shale%20OR%20drilling%20OR%20pipeline';
+                const url = `https://api.currentsapi.services/v1/search?keywords=${energyKeywords}&language=en&apiKey=${API_KEYS.CURRENTS}`;
                 
-                log(`🔄 CurrentsAPI: Fetching energy news`);
+                log(`🔄 CurrentsAPI: Fetching energy sector news`);
                 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -1541,19 +1746,32 @@
                 const data = await response.json();
                 
                 if (data.news && data.news.length > 0) {
-                    const newsItems = data.news.slice(0, 6).map(item => ({
+                    // Filter for relevance
+                    const energyTerms = ['oil', 'gas', 'energy', 'crude', 'petroleum', 'opec', 'drilling', 'pipeline', 'shale', 'lng', 'refinery', 'barrel'];
+                    const relevantNews = data.news.filter(item => 
+                        energyTerms.some(term => 
+                            item.title.toLowerCase().includes(term) || 
+                            (item.description && item.description.toLowerCase().includes(term))
+                        )
+                    );
+                    
+                    const newsItems = relevantNews.slice(0, 6).map(item => ({
                         title: item.title,
                         url: item.url,
-                        source: 'CurrentsAPI',
+                        source: item.author || 'CurrentsAPI',
                         time: item.published
                     }));
                     
-                    apiStats.currents.success++;
-                    apiUsage.currents.count++;
-                    updateApiUsageDisplay();
-                    
-                    log(`✅ CurrentsAPI: Loaded ${newsItems.length} articles`);
-                    return newsItems;
+                    if (newsItems.length > 0) {
+                        apiStats.currents.success++;
+                        apiUsage.currents.count++;
+                        updateApiUsageDisplay();
+                        
+                        log(`✅ CurrentsAPI: Loaded ${newsItems.length} energy-specific articles`);
+                        return newsItems;
+                    } else {
+                        throw new Error('No relevant energy news found');
+                    }
                 } else {
                     throw new Error('No news data');
                 }
@@ -1573,9 +1791,11 @@
                     return null;
                 }
                 
-                const url = `https://gnews.io/api/v4/search?q=oil%20OR%20gas%20OR%20energy&lang=en&max=6&apikey=${API_KEYS.GNEWS}`;
+                // Energy-specific search query
+                const query = 'oil%20prices%20OR%20natural%20gas%20OR%20OPEC%20OR%20energy%20sector%20OR%20crude%20oil';
+                const url = `https://gnews.io/api/v4/search?q=${query}&lang=en&max=10&apikey=${API_KEYS.GNEWS}`;
                 
-                log(`🔄 GNews: Fetching energy news`);
+                log(`🔄 GNews: Fetching energy sector news`);
                 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -1583,18 +1803,31 @@
                 const data = await response.json();
                 
                 if (data.articles && data.articles.length > 0) {
-                    const newsItems = data.articles.map(item => ({
+                    // Additional filtering for energy relevance
+                    const energyTerms = ['oil', 'gas', 'energy', 'crude', 'petroleum', 'opec', 'drilling', 'pipeline', 'shale', 'lng', 'refinery'];
+                    const relevantArticles = data.articles.filter(item => 
+                        energyTerms.some(term => 
+                            item.title.toLowerCase().includes(term) || 
+                            item.description.toLowerCase().includes(term)
+                        )
+                    );
+                    
+                    const newsItems = relevantArticles.slice(0, 6).map(item => ({
                         title: item.title,
                         url: item.url,
-                        source: 'GNews',
+                        source: item.source.name || 'GNews',
                         time: item.publishedAt
                     }));
                     
-                    apiStats.gnews.success++;
-                    apiUsage.gnews.count++;
-                    
-                    log(`✅ GNews: Loaded ${newsItems.length} articles`);
-                    return newsItems;
+                    if (newsItems.length > 0) {
+                        apiStats.gnews.success++;
+                        apiUsage.gnews.count++;
+                        
+                        log(`✅ GNews: Loaded ${newsItems.length} energy-specific articles`);
+                        return newsItems;
+                    } else {
+                        throw new Error('No relevant energy news found');
+                    }
                 } else {
                     throw new Error('No news data');
                 }
@@ -1614,9 +1847,11 @@
                     return null;
                 }
                 
-                const url = `http://api.mediastack.com/v1/news?access_key=${API_KEYS.MEDIASTACK}&keywords=oil,gas,energy&languages=en&limit=6`;
+                // Note: Mediastack uses HTTP, not HTTPS
+                const keywords = 'oil,natural gas,crude,OPEC,energy prices,petroleum';
+                const url = `http://api.mediastack.com/v1/news?access_key=${API_KEYS.MEDIASTACK}&keywords=${keywords}&languages=en&limit=10`;
                 
-                log(`🔄 Mediastack: Fetching energy news`);
+                log(`🔄 Mediastack: Fetching energy sector news`);
                 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -1624,18 +1859,31 @@
                 const data = await response.json();
                 
                 if (data.data && data.data.length > 0) {
-                    const newsItems = data.data.map(item => ({
+                    // Filter for energy relevance
+                    const energyTerms = ['oil', 'gas', 'energy', 'crude', 'petroleum', 'opec', 'drilling', 'pipeline'];
+                    const relevantNews = data.data.filter(item => 
+                        energyTerms.some(term => 
+                            item.title.toLowerCase().includes(term) || 
+                            (item.description && item.description.toLowerCase().includes(term))
+                        )
+                    );
+                    
+                    const newsItems = relevantNews.slice(0, 6).map(item => ({
                         title: item.title,
                         url: item.url,
-                        source: 'Mediastack',
+                        source: item.source || 'Mediastack',
                         time: item.published_at
                     }));
                     
-                    apiStats.mediastack.success++;
-                    apiUsage.mediastack.count++;
-                    
-                    log(`✅ Mediastack: Loaded ${newsItems.length} articles`);
-                    return newsItems;
+                    if (newsItems.length > 0) {
+                        apiStats.mediastack.success++;
+                        apiUsage.mediastack.count++;
+                        
+                        log(`✅ Mediastack: Loaded ${newsItems.length} energy-specific articles`);
+                        return newsItems;
+                    } else {
+                        throw new Error('No relevant energy news found');
+                    }
                 } else {
                     throw new Error('No news data');
                 }
@@ -1656,60 +1904,60 @@
             const currentsNews = await fetchFromCurrentsAPI();
             if (currentsNews) allNews = [...allNews, ...currentsNews];
             
-            const gnewsItems = await fetchFromGNews();
-            if (gnewsItems) allNews = [...allNews, ...gnewsItems];
-            
-            // Only use Mediastack if we need more news
-            if (allNews.length < 8) {
-                const mediastackNews = await fetchFromMediastack();
-                if (mediastackNews) allNews = [...allNews, ...mediastackNews];
-            }
-            
-            if (allNews.length > 0) {
-                displayNews(allNews.slice(0, 12));
-                updateNewsStatus(`✅ Loaded ${allNews.length} live energy headlines`);
-                log(`✅ Total news items loaded: ${allNews.length}`);
-            } else {
-                updateNewsStatus('❌ Live news unavailable - showing energy examples');
-                displayFallbackNews();
-            }
-        }
+const gnewsItems = await fetchFromGNews();
+if (gnewsItems) allNews = [...allNews, ...gnewsItems];
 
-        function displayNews(newsItems) {
-            const container = document.getElementById('newsContainer');
-            if (!container) return;
-            
-            const newsHtml = newsItems.map(item => `
-                <div class="news-item">
-                    <div class="news-title">${item.title}</div>
-                    <div class="news-source">
-                        <span>${item.source}</span>
-                        <a href="${item.url}" target="_blank" class="news-link">Read More</a>
-                    </div>
-                </div>
-            `).join('');
-            
-            container.innerHTML = newsHtml;
-        }
+// Only use Mediastack if we need more news
+if (allNews.length < 8) {
+    const mediastackNews = await fetchFromMediastack();
+    if (mediastackNews) allNews = [...allNews, ...mediastackNews];
+}
 
-        function displayFallbackNews() {
-            const fallbackNews = [
-                { title: 'Federal Pipeline Infrastructure Regulations Face Legal Challenge from Energy Groups', source: 'Energy Policy Watch', url: 'https://example.com' },
-                { title: 'Natural Gas Drilling Operations in Permian Basin Under New Regulatory Scrutiny', source: 'Oil & Gas Journal', url: 'https://example.com' },
-                { title: 'Data Center Energy Demand Drives New Natural Gas Pipeline Projects', source: 'Infrastructure Today', url: 'https://example.com' },
-                { title: 'Oil and Gas E&P Companies Challenge State Environmental Policies in Court', source: 'Petroleum News', url: 'https://example.com' },
-                { title: 'Wellhead Safety Regulations Updated Following Industry Compliance Review', source: 'Drilling Contractor', url: 'https://example.com' },
-                { title: 'Crude Oil Pipeline Litigation Reaches Federal Appeals Court Level', source: 'Energy Legal News', url: 'https://example.com' }
-            ];
-            displayNews(fallbackNews);
-        }
+if (allNews.length > 0) {
+    displayNews(allNews.slice(0, 12));
+    updateNewsStatus(`✅ Loaded ${allNews.length} live energy headlines`);
+    log(`✅ Total news items loaded: ${allNews.length}`);
+} else {
+    updateNewsStatus('❌ Live news unavailable - showing energy examples');
+    displayFallbackNews();
+}
 
-        function updateNewsStatus(message) {
-            const element = document.getElementById('newsStatus');
-            if (element) {
-                element.textContent = message;
-            }
-        }
+function displayNews(newsItems) {
+    const container = document.getElementById('newsContainer');
+    if (!container) return;
+
+    const newsHtml = newsItems.map(item => `
+        <div class="news-item">
+            <div class="news-title">${item.title}</div>
+            <div class="news-source">
+                <span>${item.source}</span>
+                <a href="${item.url}" target="_blank" class="news-link">Read More</a>
+            </div>
+        </div>
+    `).join('');
+
+    container.innerHTML = newsHtml;
+}
+
+function displayFallbackNews() {
+    const fallbackNews = [
+        { title: 'Federal Pipeline Infrastructure Regulations Face Legal Challenge from Energy Groups', source: 'Energy Policy Watch', url: 'https://example.com' },
+        { title: 'Natural Gas Drilling Operations in Permian Basin Under New Regulatory Scrutiny', source: 'Oil & Gas Journal', url: 'https://example.com' },
+        { title: 'Data Center Energy Demand Drives New Natural Gas Pipeline Projects', source: 'Infrastructure Today', url: 'https://example.com' },
+        { title: 'Oil and Gas E&P Companies Challenge State Environmental Policies in Court', source: 'Petroleum News', url: 'https://example.com' },
+        { title: 'Wellhead Safety Regulations Updated Following Industry Compliance Review', source: 'Drilling Contractor', url: 'https://example.com' },
+        { title: 'Crude Oil Pipeline Litigation Reaches Federal Appeals Court Level', source: 'Energy Legal News', url: 'https://example.com' }
+    ];
+    displayNews(fallbackNews);
+}
+
+function updateNewsStatus(message) {
+    const element = document.getElementById('newsStatus');
+    if (element) {
+        element.textContent = message;
+    }
+}
+
 
         // ============= DISPLAY FUNCTIONS =============
         function formatPrice(price, symbol) {
@@ -1881,10 +2129,44 @@
             let liveCount = 0;
             
             for (const symbol of commodities) {
-                let data = await fetchFromTwelveData(symbol);
+                let data = null;
+                
+                // Try multiple APIs in sequence
+                data = await fetchFromTwelveData(symbol);
                 
                 if (!data) {
-                    data = await fetchFromYahooWithProxy(symbol);
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    data = await fetchFromAlphaVantage(symbol);
+                }
+                
+                if (!data) {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                    // Try a different CORS proxy
+                    const altProxy = 'https://api.allorigins.win/raw?url=';
+                    try {
+                        const url = `${altProxy}https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
+                        log(`🔄 Alternative proxy: Fetching ${symbol}`);
+                        
+                        const response = await fetch(url);
+                        if (response.ok) {
+                            const jsonData = await response.json();
+                            if (jsonData.quoteResponse && jsonData.quoteResponse.result && jsonData.quoteResponse.result.length > 0) {
+                                const quote = jsonData.quoteResponse.result[0];
+                                if (quote.regularMarketPrice) {
+                                    data = {
+                                        price: quote.regularMarketPrice,
+                                        change: quote.regularMarketChange || 0,
+                                        changePercent: quote.regularMarketChangePercent || 0,
+                                        isLive: true,
+                                        source: 'Yahoo-Alt'
+                                    };
+                                    log(`✅ Alternative proxy: ${symbol} = ${data.price.toFixed(2)}`);
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        log(`❌ Alternative proxy failed: ${error.message}`);
+                    }
                 }
                 
                 if (data) {
@@ -1905,6 +2187,7 @@
                         name: getAssetName(symbol),
                         symbol: symbol
                     };
+                    log(`📊 Using simulation for ${symbol}: ${simulatedData.price.toFixed(2)}`);
                 }
                 
                 // Update price history
