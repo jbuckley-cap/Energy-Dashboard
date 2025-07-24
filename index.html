@@ -1,192 +1,2028 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Professional Energy Terminal</title>
-  <style>
-    /* Your existing styles here */
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Energy Market Terminal</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Energy Industry Color Palette */
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #131722;
+            --bg-tertiary: #1e222d;
+            --bg-card: #1e2329;
+            --bg-card-hover: #252831;
+            
+            /* Commodity Colors - Oil/Gold Tones */
+            --commodity-primary: #f7931e;
+            --commodity-secondary: #ff6b35;
+            --commodity-gradient: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #ffd700 100%);
+            
+            /* Natural Gas Blues */
+            --gas-primary: #2196f3;
+            --gas-secondary: #1976d2;
+            --gas-gradient: linear-gradient(135deg, #64b5f6 0%, #2196f3 50%, #1565c0 100%);
+            
+            /* Energy Companies */
+            --company-primary: #00d4aa;
+            --company-secondary: #00a8ff;
+            --company-gradient: linear-gradient(135deg, #00d4aa 0%, #00a8ff 100%);
+            
+            /* Oil Services */
+            --services-primary: #ff6b6b;
+            --services-secondary: #ee5a24;
+            --services-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            
+            /* Performance Colors */
+            --energy-green: #00ff88;
+            --energy-red: #ff4757;
+            --energy-green-bg: rgba(0, 255, 136, 0.1);
+            --energy-red-bg: rgba(255, 71, 87, 0.1);
+            
+            /* Text Colors */
+            --text-primary: #ffffff;
+            --text-secondary: #b2b5be;
+            --text-tertiary: #787b86;
+            --text-accent: #00d4aa;
+            
+            /* Border Colors */
+            --border-primary: #2a2e39;
+            --border-secondary: #363c4e;
+            --border-accent: rgba(0, 212, 170, 0.3);
+            
+            /* Monospace Font for Numbers */
+            --font-mono: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        /* Enhanced Typography */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-primary);
+        }
+
+        .header h1 {
+            font-size: 3.2em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: var(--company-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+        }
+
+        .last-updated {
+            font-family: var(--font-mono);
+            font-size: 0.95em;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .api-status {
+            margin-top: 15px;
+            padding: 12px 20px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-size: 0.9em;
+            border: 1px solid var(--border-secondary);
+            font-family: var(--font-mono);
+        }
+
+        /* Professional Controls */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-primary);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9em;
+        }
+
+        .control-group input, .control-group select {
+            padding: 10px 14px;
+            border: 1px solid var(--border-secondary);
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: var(--font-mono);
+            transition: all 0.2s ease;
+        }
+
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: var(--text-accent);
+            box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
+        }
+
+        .control-group select option {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            padding: 8px;
+        }
+
+        .control-group input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .btn {
+            padding: 10px 18px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-secondary);
+            color: var(--text-primary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--text-accent);
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced Market Summary */
+        .market-summary {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid var(--border-primary);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-item {
+            text-align: center;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            border: 1px solid var(--border-secondary);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 212, 170, 0.15);
+            border-color: var(--text-accent);
+        }
+
+        .summary-title {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-value {
+            font-size: 1.6em;
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+
+        /* Professional News Section */
+        .news-section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid var(--border-primary);
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .news-item {
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            border-left: 3px solid var(--text-accent);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-secondary);
+        }
+
+        .news-item:hover {
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .news-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+            line-height: 1.4;
+            color: var(--text-primary);
+        }
+
+        .news-source {
+            font-size: 0.8em;
+            color: var(--text-tertiary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .news-link {
+            color: var(--text-accent);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .news-link:hover {
+            color: var(--energy-green);
+        }
+
+        /* Professional Section Headers */
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 2em;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--text-accent);
+            border-radius: 2px;
+        }
+
+        /* Enhanced Grid Layouts */
+        .commodities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 25px;
+        }
+
+        .companies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 20px;
+        }
+
+        /* Professional Price Cards */
+        .price-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid var(--border-primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .commodity-card {
+            padding: 30px;
+            min-height: 280px;
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(247, 147, 30, 0.05) 100%);
+        }
+
+        .company-card {
+            min-height: 240px;
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(0, 212, 170, 0.03) 100%);
+        }
+
+        .services-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 107, 107, 0.03) 100%);
+        }
+
+        /* Conditional Formatting for Major Moves */
+        .price-card.major-gain {
+            background: var(--energy-green-bg);
+            border-color: var(--energy-green);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+        }
+
+        .price-card.major-loss {
+            background: var(--energy-red-bg);
+            border-color: var(--energy-red);
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.2);
+        }
+
+        .price-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border-color: var(--text-accent);
+        }
+
+        .price-card.expanded {
+            transform: scale(1.02);
+            z-index: 10;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Enhanced Top Border Indicators */
+        .price-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .commodity-card::before {
+            background: var(--commodity-gradient);
+        }
+
+        .company-card::before {
+            background: var(--company-gradient);
+        }
+
+        .services-card::before {
+            background: var(--services-gradient);
+        }
+
+        /* Natural Gas Special Styling */
+        .price-card[data-symbol="NG=F"]::before {
+            background: var(--gas-gradient);
+        }
+
+        .price-card[data-symbol="NG=F"] {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(33, 150, 243, 0.05) 100%);
+        }
+
+        /* Enhanced Symbol Display */
+        .symbol {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+        }
+
+        .company-card .symbol {
+            font-size: 1.2em;
+        }
+
+        .company-name {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 18px;
+            line-height: 1.3;
+            font-weight: 500;
+        }
+
+        /* Professional Price Display */
+        .price {
+            font-size: 2.4em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-family: var(--font-mono);
+            letter-spacing: -0.5px;
+        }
+
+        .company-card .price {
+            font-size: 2em;
+        }
+
+        .change {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .change-amount {
+            font-size: 1.1em;
+            font-weight: 600;
+            font-family: var(--font-mono);
+        }
+
+        .change-percent {
+            font-size: 0.9em;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            letter-spacing: 0.3px;
+        }
+
+        .positive {
+            color: var(--energy-green);
+        }
+
+        .negative {
+            color: var(--energy-red);
+        }
+
+        .positive .change-percent {
+            background: rgba(0, 255, 136, 0.15);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .negative .change-percent {
+            background: rgba(255, 71, 87, 0.15);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        /* Loading States */
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 1.1em;
+            color: var(--text-secondary);
+        }
+
+        /* Enhanced Status Indicators */
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+
+        .status-live {
+            background: var(--energy-green);
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .status-error {
+            background: var(--energy-red);
+            animation: pulse-red 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Advanced Charts Container */
+        .price-chart {
+            height: 80px;
+            margin-top: 20px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 8px;
+            border: 1px solid var(--border-secondary);
+        }
+
+        .company-card .price-chart {
+            height: 60px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            cursor: crosshair;
+        }
+
+        .candlestick-chart {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Enhanced Chart Styling */
+        .price-line {
+            fill: none;
+            stroke-width: 2.5;
+            filter: drop-shadow(0 0 4px currentColor);
+        }
+
+        .commodity-chart .price-line {
+            stroke: var(--commodity-primary);
+        }
+
+        .company-chart .price-line {
+            stroke: var(--company-primary);
+        }
+
+        .services-chart .price-line {
+            stroke: var(--services-primary);
+        }
+
+        .gas-chart .price-line {
+            stroke: var(--gas-primary);
+        }
+
+        .chart-area {
+            opacity: 0.15;
+        }
+
+        .commodity-chart .chart-area {
+            fill: var(--commodity-primary);
+        }
+
+        .company-chart .chart-area {
+            fill: var(--company-primary);
+        }
+
+        .services-chart .chart-area {
+            fill: var(--services-primary);
+        }
+
+        .gas-chart .chart-area {
+            fill: var(--gas-primary);
+        }
+
+        /* Candlestick Chart Elements */
+        .candlestick {
+            transition: all 0.2s ease;
+        }
+
+        .candlestick:hover {
+            stroke-width: 2;
+            filter: drop-shadow(0 0 5px currentColor);
+        }
+
+        .candle-up {
+            fill: var(--energy-green);
+            stroke: var(--energy-green);
+        }
+
+        .candle-down {
+            fill: var(--energy-red);
+            stroke: var(--energy-red);
+        }
+
+        .volume-bar {
+            opacity: 0.3;
+            transition: opacity 0.2s ease;
+        }
+
+        .volume-bar:hover {
+            opacity: 0.7;
+        }
+
+        .moving-average {
+            fill: none;
+            stroke-width: 1.5;
+            stroke-dasharray: 2,2;
+            opacity: 0.7;
+        }
+
+        .ma-20 {
+            stroke: var(--text-accent);
+        }
+
+        .ma-50 {
+            stroke: #ff9800;
+        }
+
+        /* Professional Tooltips */
+        .tooltip {
+            position: absolute;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-secondary);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.85em;
+            font-family: var(--font-mono);
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+        }
+
+        .tooltip-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .tooltip-data {
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 8px 16px;
+            color: var(--text-secondary);
+        }
+
+        .tooltip-label {
+            font-weight: 500;
+        }
+
+        .tooltip-value {
+            text-align: right;
+            color: var(--text-primary);
+        }
+
+        /* Enhanced Debug Panel */
+        .debug-panel {
+            background: var(--bg-tertiary);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: var(--font-mono);
+            font-size: 0.8em;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border-secondary);
+        }
+
+        .debug-title {
+            color: var(--text-accent);
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1em;
+        }
+
+        .api-stats {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 0.9em;
+            border: 1px solid var(--border-primary);
+        }
+
+        /* API Usage Monitor */
+        .api-usage-monitor {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.85em;
+        }
+
+        .usage-bar {
+            background: var(--bg-tertiary);
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+
+        .usage-fill {
+            height: 100%;
+            background: var(--text-accent);
+            transition: width 0.3s ease;
+        }
+
+        /* Refresh Indicators */
+        .refresh-info {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+
+        .refresh-item {
+            padding: 5px 10px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        /* Drag and Drop Functionality */
+        .price-card.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .price-card.drag-over {
+            border-color: var(--text-accent);
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
+        }
+
+        /* Deployment Status */
+        .deployment-info {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid var(--border-accent);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.4em;
+            }
+            
+            .commodities-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .companies-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .price {
+                font-size: 2em;
+            }
+            
+            .company-card .price {
+                font-size: 1.6em;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Professional Energy Terminal</h1>
-  <!-- Example data tables -->
-  <section id="stocks-section">
-    <h2>Stocks</h2>
-    <table>
-      <thead><tr><th>Symbol</th><th>Price</th><th>Change</th></tr></thead>
-      <tbody id="stockData">
-        <!-- Filled by JS -->
-      </tbody>
-    </table>
-  </section>
+    <div class="container">
+        <div class="header">
+            <h1>⛽ Professional Energy Terminal</h1>
+            <div class="last-updated">Last updated: <span id="lastUpdate">Initializing...</span></div>
+            <div class="api-status">
+                📡 <strong>Market Data Status:</strong> <span id="apiStatus">Connecting to live data sources...</span>
+            </div>
+            <div class="refresh-info">
+                <div class="refresh-item">📈 Stocks: Every 2 min</div>
+                <div class="refresh-item">🛢️ Commodities: Every 10 min</div>
+                <div class="refresh-item">📰 News: Every 10 min</div>
+            </div>
+            <div class="deployment-info">
+                🚀 <strong>Optimized Terminal:</strong> Real-time stocks via Finnhub (2min), Commodities via TwelveData (10min), News via CurrentsAPI/GNews (10min).
+                Smart API usage keeps all data fresh while staying well under limits.
+            </div>
+        </div>
 
-  <section id="commodities-section">
-    <h2>Commodities</h2>
-    <table>
-      <thead><tr><th>Name</th><th>Price</th><th>Unit</th></tr></thead>
-      <tbody id="commodityData">
-        <!-- Filled by JS -->
-      </tbody>
-    </table>
-  </section>
+        <div class="controls">
+            <div class="control-group">
+                <label>Add Symbol:</label>
+                <input type="text" id="symbolInput" placeholder="e.g., XOM, NG=F" maxlength="10">
+                <button class="btn" onclick="addSymbol()">Add</button>
+            </div>
+            <div class="control-group">
+                <button class="btn" onclick="toggleUpdates()" id="toggleBtn">⏸️ Pause</button>
+                <button class="btn" onclick="refreshAll()">🔄 Refresh All</button>
+                <button class="btn" onclick="toggleDebug()">🔍 Debug</button>
+            </div>
+        </div>
 
-  <section id="news-section">
-    <h2>News</h2>
-    <div id="newsApiStats"></div>
-    <ul id="newsData">
-      <!-- Filled by JS -->
-    </ul>
-  </section>
+        <!-- Debug Panel -->
+        <div id="debugPanel" class="debug-panel" style="display: none;">
+            <div class="debug-title">🔍 Professional API Monitoring</div>
+            <div class="api-stats" id="apiStats">
+                <strong>Multi-Source Data Performance:</strong><br>
+                • Yahoo Finance: <span id="yahooStats">Not tested</span><br>
+                • Finnhub Pro: <span id="finnhubStats">Not tested</span><br>
+                • TwelveData: <span id="twelveStats">Not tested</span><br>
+                • News Sources: <span id="newsApiStats">Not tested</span>
+            </div>
+            <div class="api-usage-monitor">
+                <strong>API Usage Today:</strong>
+                <div>TwelveData: <span id="twelveUsage">0</span>/800 calls</div>
+                <div class="usage-bar">
+                    <div class="usage-fill" id="twelveUsageBar" style="width: 0%"></div>
+                </div>
+                <div>CurrentsAPI: <span id="currentsUsage">0</span>/600 calls</div>
+                <div class="usage-bar">
+                    <div class="usage-fill" id="currentsUsageBar" style="width: 0%"></div>
+                </div>
+            </div>
+            <div id="debugLog"></div>
+        </div>
 
-  <button id="debugToggle">Toggle Debug</button>
-  <pre id="debugLog"></pre>
+        <!-- Market Summary Section -->
+        <div class="market-summary">
+            <h2 style="text-align: center; margin-bottom: 25px; font-size: 1.8em; font-weight: 700;">📊 Energy Market Overview</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-title">Energy Sector Avg</div>
+                    <div class="summary-value" id="energySector">Loading...</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-title">Commodities Avg</div>
+                    <div class="summary-value" id="commoditiesAvg">Loading...</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-title">Top Gainer</div>
+                    <div class="summary-value" id="topGainer">Loading...</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-title">Top Loser</div>
+                    <div class="summary-value" id="topLoser">Loading...</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-title">Oil-Gas Correlation</div>
+                    <div class="summary-value" id="correlation">Loading...</div>
+                </div>
+            </div>
+        </div>
 
-  <script>
-    // ============= CONFIG & KEYS =============
-    const CORS_PROXY = '';   // no proxy in use
-    const API_KEYS = {
-      FINNHUB:    'd20i9lpr01qrk6cl5adgd20i9lpr01qrk6cl5ae0',
-      TWELVEDATA: 'b7bc43ebc653428cb1a5d968a23b67ee',
-      CURRENTS:   '5vexUPN43TdFfjFM_BdejcR9lnE_JyDHU-ceWHbIb-GG4Iy5',
-      GNEWS:      '22b87731ed1048479c91c7b1831303ca',
-      MEDIASTACK: 'c2ddab844edc121d2d7d3c84f450ae9e'
-    };
+        <!-- News Section -->
+        <div class="news-section">
+            <h2 style="text-align: center; margin-bottom: 25px; font-size: 1.8em; font-weight: 700;">📰 Energy Market Intelligence</h2>
+            <div id="newsStatus" style="text-align: center; margin-bottom: 20px; color: var(--text-secondary);">Loading targeted energy news...</div>
+            <div id="newsContainer" class="news-grid">
+                <div class="loading">Fetching latest energy industry intelligence...</div>
+            </div>
+        </div>
 
-    // ============= UTILS =============
-    const REFRESH_CONFIG = {
-      stocks:      { interval: 60000,   symbols: ['XOM','CVX','BP'] },
-      commodities: { interval: 300000,  items: ['CL=F','NG=F'] },
-      news:        { interval: 900000,  query: 'energy' }
-    };
+        <div class="section">
+            <h2 class="section-title">🛢️ Energy Commodities</h2>
+            <div id="commoditiesGrid" class="commodities-grid">
+                <div class="loading">Loading live commodity market data...</div>
+            </div>
+        </div>
 
-    let apiStats = {
-      yahoo:      { success: 0, failed: 0 },
-      finnhub:    { success: 0, failed: 0 },
-      twelvedata: { success: 0, failed: 0 },
-      currents:   { success: 0, failed: 0 },
-      mediastack: { success: 0, failed: 0 }
-    };
+        <div class="section">
+            <h2 class="section-title">🏭 Energy Corporations</h2>
+            <div id="companiesGrid" class="companies-grid">
+                <div class="loading">Loading live corporate equity data...</div>
+            </div>
+        </div>
 
-    // ============= FETCH FUNCTIONS =============
-    async function fetchFromYahooWithProxy(symbol) {
-      const url = `${CORS_PROXY}https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        apiStats.yahoo.success++;
-        return data.quoteResponse.result[0];
-      } catch (e) {
-        apiStats.yahoo.failed++;
-        console.error('Yahoo fetch error:', e);
-        return null;
-      }
-    }
+        <div class="section">
+            <h2 class="section-title">🔧 Oilfield Services</h2>
+            <div id="servicesGrid" class="companies-grid">
+                <div class="loading">Loading live services sector data...</div>
+            </div>
+        </div>
 
-    async function fetchFinnhubPrice(symbol) {
-      const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEYS.FINNHUB}`;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        apiStats.finnhub.success++;
-        return data;
-      } catch (e) {
-        apiStats.finnhub.failed++;
-        console.error('Finnhub fetch error:', e);
-        return null;
-      }
-    }
+        <!-- Tooltip -->
+        <div id="tooltip" class="tooltip">
+            <div class="tooltip-title"></div>
+            <div class="tooltip-data"></div>
+        </div>
+    </div>
 
-    async function fetchTwelveData(symbol) {
-      const url = `https://api.twelvedata.com/price?symbol=${symbol}&apikey=${API_KEYS.TWELVEDATA}`;
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-        apiStats.twelvedata.success++;
-        return data;
-      } catch (e) {
-        apiStats.twelvedata.failed++;
-        console.error('TwelveData fetch error:', e);
-        return null;
-      }
-    }
+    <script>
+        // ============= API CONFIGURATION =============
+        const API_KEYS = {
+            FINNHUB: 'd20i9lpr01qrk6cl5adgd20i9lpr01qrk6cl5ae0',
+            TWELVEDATA: 'b7bc43ebc653428cb1a5d968a23b67ee',
+            CURRENTS: '5vexUPN43TdFfjFM_BdejcR9lnE_JyDHU-ceWHbIb-GG4Iy5',
+            GNEWS: '22b87731ed1048479c91c7b1831303ca',
+            MEDIASTACK: 'c2ddab844edc121d2d7d3c84f450ae9e'
+        };
 
-    async function fetchCommodities() {
-      const tbody = document.getElementById('commodityData');
-      tbody.innerHTML = '';
-      for (const item of REFRESH_CONFIG.commodities.items) {
-        const url = `https://api.polygon.io/v1/last_quote/commodities/${item}?apiKey=M6qDtP6faizuLBGsbaOpoq3apRrVCe6h`;
-        try {
-          const res = await fetch(url);
-          const data = await res.json();
-          const row = `<tr><td>${item}</td><td>${data.last.price}</td><td>${data.last.size}</td></tr>`;
-          tbody.insertAdjacentHTML('beforeend', row);
-        } catch (e) {
-          console.error('Commodities fetch error:', e);
-        }
-      }
-    }
+        // CORS Proxy for Yahoo Finance fallback
+        const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+        
+        // Energy symbols organized by category
+        const commodities = ['CL=F', 'NG=F', 'BZ=F'];
+        const companies = ['XOM', 'CVX', 'COP', 'EOG', 'EQT', 'KMI', 'EPD', 'ET', 'WMB', 'VLO', 'PSX', 'MPC'];
+        const services = ['SLB', 'HAL', 'BKR'];
+        let allSymbols = [...commodities, ...companies, ...services];
+        
+        // Optimized refresh intervals
+        const REFRESH_CONFIG = {
+            stocks: {
+                interval: 2 * 60000,  // 2 minutes
+                lastUpdate: null
+            },
+            commodities: {
+                interval: 10 * 60000,  // 10 minutes
+                lastUpdate: null
+            },
+            news: {
+                interval: 10 * 60000,  // 10 minutes
+                lastUpdate: null
+            }
+        };
 
-    async function fetchEnhancedNews() {
-      const list = document.getElementById('newsData');
-      list.innerHTML = '';
-      // Example using NewsAPI
-      try {
-        const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(REFRESH_CONFIG.news.query)}&apiKey=${API_KEYS.GNEWS}`;
-        const res = await fetch(url);
-        const data = await res.json();
-        apiStats.currents.success++;
-        data.articles.slice(0, 5).forEach(a => {
-          const li = `<li><a href='${a.url}' target='_blank'>${a.title}</a></li>`;
-          list.insertAdjacentHTML('beforeend', li);
+        // Global state
+        let stockInterval;
+        let commodityInterval;
+        let newsInterval;
+        let isUpdating = true;
+        let priceHistory = {};
+        let priceData = {};
+        let volumeData = {};
+        let debugMode = false;
+        let debugLog = [];
+        let expandedCard = null;
+        
+        // API statistics
+        let apiStats = {
+            yahoo: { success: 0, failed: 0, lastTry: null },
+            finnhub: { success: 0, failed: 0, lastTry: null },
+            twelvedata: { success: 0, failed: 0, lastTry: null },
+            currents: { success: 0, failed: 0, lastTry: null },
+            gnews: { success: 0, failed: 0, lastTry: null },
+            mediastack: { success: 0, failed: 0, lastTry: null }
+        };
+
+        // API usage tracking
+        let apiUsage = {
+            twelvedata: { count: 0, resetTime: getMidnight() },
+            currents: { count: 0, resetTime: getMidnight() },
+            gnews: { count: 0, resetTime: getMidnight() },
+            mediastack: { count: 0, resetTime: getMonthStart() }
+        };
+
+        // Initialize data structures
+        allSymbols.forEach(symbol => {
+            priceHistory[symbol] = [];
+            volumeData[symbol] = [];
         });
-      } catch (e) {
-        apiStats.currents.failed++;
-        console.error('News fetch error:', e);
-      }
-      updateApiStats();
-    }
 
-    // ============= UPDATE UI =============
-    async function updateStocks() {
-      const tbody = document.getElementById('stockData');
-      tbody.innerHTML = '';
-      for (const symbol of REFRESH_CONFIG.stocks.symbols) {
-        const yf = await fetchFromYahooWithProxy(symbol);
-        if (yf) {
-          const row = `<tr><td>${symbol}</td><td>${yf.regularMarketPrice}</td><td>${yf.regularMarketChange.toFixed(2)}</td></tr>`;
-          tbody.insertAdjacentHTML('beforeend', row);
+        // ============= UTILITY FUNCTIONS =============
+        function getMidnight() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+            return tomorrow.getTime();
         }
-      }
-      updateApiStats();
-    }
 
-    function updateApiStats() {
-      document.getElementById('newsApiStats').innerHTML =
-        `C:${apiStats.currents.success}/${apiStats.currents.failed}  M:${apiStats.mediastack.success}/${apiStats.mediastack.failed}`;
-    }
+        function getMonthStart() {
+            const nextMonth = new Date();
+            nextMonth.setMonth(nextMonth.getMonth() + 1);
+            nextMonth.setDate(1);
+            nextMonth.setHours(0, 0, 0, 0);
+            return nextMonth.getTime();
+        }
 
-    // ============= DEBUG =============
-    function toggleDebug() {
-      document.getElementById('debugLog').classList.toggle('hidden');
-    }
-    document.getElementById('debugToggle').onclick = toggleDebug;
+        function checkApiUsageReset() {
+            const now = Date.now();
+            
+            // Reset daily counters
+            if (now >= apiUsage.twelvedata.resetTime) {
+                apiUsage.twelvedata.count = 0;
+                apiUsage.twelvedata.resetTime = getMidnight();
+            }
+            if (now >= apiUsage.currents.resetTime) {
+                apiUsage.currents.count = 0;
+                apiUsage.currents.resetTime = getMidnight();
+            }
+            if (now >= apiUsage.gnews.resetTime) {
+                apiUsage.gnews.count = 0;
+                apiUsage.gnews.resetTime = getMidnight();
+            }
+            
+            // Reset monthly counter
+            if (now >= apiUsage.mediastack.resetTime) {
+                apiUsage.mediastack.count = 0;
+                apiUsage.mediastack.resetTime = getMonthStart();
+            }
+            
+            updateApiUsageDisplay();
+        }
 
-    // ============= INIT & INTERVALS =============
-    function startIntervals() {
-      setInterval(updateStocks, REFRESH_CONFIG.stocks.interval);
-      setInterval(fetchCommodities, REFRESH_CONFIG.commodities.interval);
-      setInterval(fetchEnhancedNews, REFRESH_CONFIG.news.interval);
-    }
+        function updateApiUsageDisplay() {
+            // TwelveData usage
+            const twelvePercentage = (apiUsage.twelvedata.count / 800) * 100;
+            document.getElementById('twelveUsage').textContent = apiUsage.twelvedata.count;
+            document.getElementById('twelveUsageBar').style.width = twelvePercentage + '%';
+            
+            // CurrentsAPI usage
+            const currentsPercentage = (apiUsage.currents.count / 600) * 100;
+            document.getElementById('currentsUsage').textContent = apiUsage.currents.count;
+            document.getElementById('currentsUsageBar').style.width = currentsPercentage + '%';
+        }
 
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('🚀 Professional Energy Terminal starting...');
-      updateStocks();
-      fetchCommodities();
-      fetchEnhancedNews();
-      startIntervals();
-      console.log('✅ Professional terminal ready with optimized refresh rates');
-    });
-  </script>
+        // ============= PROFESSIONAL CHART FUNCTIONS =============
+        function generateCandlestickData(symbol, count = 20) {
+            const basePrice = getBasePrices()[symbol] || 100;
+            const data = [];
+            let currentPrice = basePrice;
+            
+            for (let i = 0; i < count; i++) {
+                const volatility = symbol.includes('=F') ? 0.02 : 0.015;
+                const change = (Math.random() - 0.5) * volatility;
+                const open = currentPrice;
+                const range = open * 0.03;
+                const high = open + (Math.random() * range);
+                const low = open - (Math.random() * range);
+                const close = Math.max(low, Math.min(high, open * (1 + change)));
+                const volume = Math.random() * 1000000 + 100000;
+                
+                data.push({ open, high, low, close, volume });
+                currentPrice = close;
+            }
+            
+            return data;
+        }
+
+        function createAdvancedChart(symbol, chartType = 'company') {
+            const candleData = generateCandlestickData(symbol, 20);
+            const width = 100;
+            const height = 100;
+            
+            const prices = candleData.map(d => [d.high, d.low]).flat();
+            const volumes = candleData.map(d => d.volume);
+            const maxPrice = Math.max(...prices);
+            const minPrice = Math.min(...prices);
+            const maxVolume = Math.max(...volumes);
+            const priceRange = maxPrice - minPrice || 1;
+            
+            let chartClass = 'company-chart';
+            if (chartType === 'commodity') chartClass = 'commodity-chart';
+            else if (chartType === 'services') chartClass = 'services-chart';
+            else if (symbol === 'NG=F') chartClass = 'gas-chart';
+
+            let candlesticks = '';
+            let volumeBars = '';
+            let movingAverage = '';
+            
+            // Generate candlesticks
+            candleData.forEach((candle, i) => {
+                const x = (i / (candleData.length - 1)) * width;
+                const candleWidth = width / candleData.length * 0.6;
+                
+                const openY = height - ((candle.open - minPrice) / priceRange) * height;
+                const closeY = height - ((candle.close - minPrice) / priceRange) * height;
+                const highY = height - ((candle.high - minPrice) / priceRange) * height;
+                const lowY = height - ((candle.low - minPrice) / priceRange) * height;
+                
+                const isUp = candle.close > candle.open;
+                const bodyTop = Math.min(openY, closeY);
+                const bodyHeight = Math.abs(closeY - openY);
+                
+                // Wick (high-low line)
+                candlesticks += `<line x1="${x}" y1="${highY}" x2="${x}" y2="${lowY}" stroke="currentColor" stroke-width="1" opacity="0.7"/>`;
+                
+                // Candle body
+                candlesticks += `<rect x="${x - candleWidth/2}" y="${bodyTop}" width="${candleWidth}" height="${bodyHeight}" 
+                    class="candlestick candle-${isUp ? 'up' : 'down'}" stroke="currentColor" stroke-width="1"/>`;
+                
+                // Volume bars (bottom 20% of chart)
+                const volumeHeight = (candle.volume / maxVolume) * (height * 0.2);
+                volumeBars += `<rect x="${x - candleWidth/2}" y="${height - volumeHeight}" width="${candleWidth}" height="${volumeHeight}" 
+                    class="volume-bar" fill="currentColor" opacity="0.3"/>`;
+            });
+            
+            // Simple moving averages
+            if (candleData.length >= 10) {
+                const ma10 = [];
+                const ma20 = [];
+                
+                for (let i = 9; i < candleData.length; i++) {
+                    const avg10 = candleData.slice(i-9, i+1).reduce((sum, d) => sum + d.close, 0) / 10;
+                    ma10.push({x: (i / (candleData.length - 1)) * width, y: height - ((avg10 - minPrice) / priceRange) * height});
+                }
+                
+                if (candleData.length >= 20) {
+                    for (let i = 19; i < candleData.length; i++) {
+                        const avg20 = candleData.slice(i-19, i+1).reduce((sum, d) => sum + d.close, 0) / 20;
+                        ma20.push({x: (i / (candleData.length - 1)) * width, y: height - ((avg20 - minPrice) / priceRange) * height});
+                    }
+                }
+                
+                if (ma10.length > 1) {
+                    const ma10Path = 'M' + ma10.map(p => `${p.x},${p.y}`).join('L');
+                    movingAverage += `<path d="${ma10Path}" class="moving-average ma-20"/>`;
+                }
+                
+                if (ma20.length > 1) {
+                    const ma20Path = 'M' + ma20.map(p => `${p.x},${p.y}`).join('L');
+                    movingAverage += `<path d="${ma20Path}" class="moving-average ma-50"/>`;
+                }
+            }
+            
+            return `
+                <div class="chart-container ${chartClass}" data-symbol="${symbol}">
+                    <svg class="candlestick-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="gradient-${symbol}" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:currentColor;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:currentColor;stop-opacity:0" />
+                            </linearGradient>
+                        </defs>
+                        ${volumeBars}
+                        ${candlesticks}
+                        ${movingAverage}
+                    </svg>
+                </div>
+            `;
+        }
+
+        // ============= ENHANCED TOOLTIP SYSTEM =============
+        function showTooltip(event, symbol, data) {
+            const tooltip = document.getElementById('tooltip');
+            const title = tooltip.querySelector('.tooltip-title');
+            const dataContainer = tooltip.querySelector('.tooltip-data');
+            
+            title.textContent = `${symbol} - ${getAssetName(symbol)}`;
+            
+            const tooltipData = [
+                ['Price', formatPrice(data.price, symbol)],
+                ['Change', `${data.change >= 0 ? '+' : ''}${data.change.toFixed(2)}`],
+                ['Change %', `${data.changePercent >= 0 ? '+' : ''}${data.changePercent.toFixed(2)}%`],
+                ['Status', data.isLive ? 'Live Data' : 'Simulated'],
+                ['Source', data.source || 'Internal'],
+                ['Updated', new Date().toLocaleTimeString()]
+            ];
+            
+            dataContainer.innerHTML = tooltipData.map(([label, value]) => 
+                `<span class="tooltip-label">${label}:</span><span class="tooltip-value">${value}</span>`
+            ).join('');
+            
+            tooltip.style.left = (event.pageX + 10) + 'px';
+            tooltip.style.top = (event.pageY - 10) + 'px';
+            tooltip.classList.add('visible');
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').classList.remove('visible');
+        }
+
+        // ============= DRAG AND DROP FUNCTIONALITY =============
+        function enableDragAndDrop() {
+            const cards = document.querySelectorAll('.price-card');
+            
+            cards.forEach(card => {
+                card.draggable = true;
+                
+                card.addEventListener('dragstart', (e) => {
+                    card.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', card.dataset.symbol);
+                });
+                
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                });
+                
+                card.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    card.classList.add('drag-over');
+                });
+                
+                card.addEventListener('dragleave', () => {
+                    card.classList.remove('drag-over');
+                });
+                
+                card.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    card.classList.remove('drag-over');
+                    const draggedSymbol = e.dataTransfer.getData('text/plain');
+                    const targetSymbol = card.dataset.symbol;
+                    
+                    if (draggedSymbol !== targetSymbol) {
+                        reorderSymbols(draggedSymbol, targetSymbol);
+                    }
+                });
+            });
+        }
+
+        function reorderSymbols(draggedSymbol, targetSymbol) {
+            // Find which arrays contain these symbols
+            const arrays = [commodities, companies, services];
+            let draggedArray, targetArray;
+            let draggedIndex, targetIndex;
+            
+            arrays.forEach(arr => {
+                const dIdx = arr.indexOf(draggedSymbol);
+                const tIdx = arr.indexOf(targetSymbol);
+                
+                if (dIdx !== -1) {
+                    draggedArray = arr;
+                    draggedIndex = dIdx;
+                }
+                
+                if (tIdx !== -1) {
+                    targetArray = arr;
+                    targetIndex = tIdx;
+                }
+            });
+            
+            if (draggedArray === targetArray) {
+                // Reorder within same array
+                draggedArray.splice(draggedIndex, 1);
+                const newTargetIndex = draggedArray.indexOf(targetSymbol);
+                draggedArray.splice(newTargetIndex, 0, draggedSymbol);
+                
+                // Re-render the appropriate section
+                renderPriceCards(draggedArray, getContainerForArray(draggedArray), getCardClassForArray(draggedArray), getChartTypeForArray(draggedArray));
+            }
+        }
+
+        function getContainerForArray(arr) {
+            if (arr === commodities) return 'commoditiesGrid';
+            if (arr === companies) return 'companiesGrid';
+            if (arr === services) return 'servicesGrid';
+        }
+
+        function getCardClassForArray(arr) {
+            if (arr === commodities) return 'commodity-card';
+            if (arr === companies) return 'company-card';
+            if (arr === services) return 'company-card services-card';
+        }
+
+        function getChartTypeForArray(arr) {
+            if (arr === commodities) return 'commodity';
+            if (arr === companies) return 'company';
+            if (arr === services) return 'services';
+        }
+
+        // ============= DEBUG FUNCTIONS =============
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            console.log(logEntry);
+            debugLog.push(logEntry);
+            if (debugLog.length > 100) debugLog.shift();
+            updateDebugDisplay();
+        }
+
+        function updateDebugDisplay() {
+            if (debugMode) {
+                const debugLogElement = document.getElementById('debugLog');
+                if (debugLogElement) {
+                    debugLogElement.innerHTML = debugLog.slice(-25).join('<br>');
+                    debugLogElement.scrollTop = debugLogElement.scrollHeight;
+                }
+            }
+        }
+
+        function updateApiStats() {
+            document.getElementById('yahooStats').innerHTML = 
+                `${apiStats.yahoo.success} success, ${apiStats.yahoo.failed} failed`;
+            document.getElementById('finnhubStats').innerHTML = 
+                `${apiStats.finnhub.success} success, ${apiStats.finnhub.failed} failed`;
+            document.getElementById('twelveStats').innerHTML = 
+                `${apiStats.twelvedata.success} success, ${apiStats.twelvedata.failed} failed`;
+            document.getElementById('newsApiStats').innerHTML = 
+                `C:${apiStats.currents.success}/${apiStats.currents.failed} G:${apiStats.gnews.success}/${apiStats.gnews.failed} M:${apiStats.mediastack.success}/${apiStats.mediastack.failed}`;
+        }
+
+        function toggleDebug() {
+            debugMode = !debugMode;
+            const panel = document.getElementById('debugPanel');
+            panel.style.display = debugMode ? 'block' : 'none';
+            updateDebugDisplay();
+            updateApiStats();
+            updateApiUsageDisplay();
+        }
+
+        function updateStatus(message) {
+            document.getElementById('apiStatus').textContent = message;
+            log(message);
+        }
+
+        // ============= PRICE DATA FUNCTIONS =============
+        function getBasePrices() {
+            return {
+                'CL=F': 65.31, 'NG=F': 3.28, 'BZ=F': 69.85,
+                'XOM': 109.48, 'CVX': 150.04, 'COP': 107.25, 'EOG': 121.30, 'EQT': 39.85,
+                'KMI': 27.84, 'EPD': 31.18, 'ET': 16.95, 'WMB': 57.82,
+                'VLO': 131.75, 'PSX': 115.20, 'MPC': 148.60,
+                'SLB': 42.50, 'HAL': 32.75, 'BKR': 34.20
+            };
+        }
+
+        function getAssetName(symbol) {
+            const names = {
+                'CL=F': 'WTI Crude Oil Futures', 'NG=F': 'Natural Gas Futures', 'BZ=F': 'Brent Crude Oil Futures',
+                'XOM': 'Exxon Mobil Corporation', 'CVX': 'Chevron Corporation', 'COP': 'ConocoPhillips',
+                'EOG': 'EOG Resources, Inc.', 'EQT': 'EQT Corporation', 'KMI': 'Kinder Morgan, Inc.',
+                'EPD': 'Enterprise Products Partners', 'ET': 'Energy Transfer LP', 'WMB': 'The Williams Companies, Inc.',
+                'VLO': 'Valero Energy Corporation', 'PSX': 'Phillips 66', 'MPC': 'Marathon Petroleum Corporation',
+                'SLB': 'Schlumberger Limited', 'HAL': 'Halliburton Company', 'BKR': 'Baker Hughes Company'
+            };
+            return names[symbol] || symbol;
+        }
+
+        function generateRealisticPrice(symbol, lastPrice = null) {
+            const basePrices = getBasePrices();
+            const basePrice = lastPrice || basePrices[symbol] || 100;
+            
+            // Create realistic market movements with trends
+            const volatility = symbol.includes('=F') ? 0.015 : 0.010;
+            const trend = Math.sin(Date.now() / 200000) * 0.003;
+            const random = (Math.random() - 0.5) * 2 * volatility;
+            const change = trend + random;
+            
+            const newPrice = Math.max(0.01, basePrice * (1 + change));
+            const priceChange = newPrice - basePrice;
+            const percentChange = (priceChange / basePrice) * 100;
+            
+            return {
+                price: newPrice,
+                change: priceChange,
+                changePercent: percentChange,
+                isLive: false
+            };
+        }
+
+        // ============= YAHOO FINANCE WITH CORS PROXY =============
+        async function fetchFromYahooWithProxy(symbol) {
+            try {
+                const url = `${CORS_PROXY}https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
+                
+                log(`🔄 Yahoo Proxy: Fetching ${symbol}`);
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.quoteResponse && data.quoteResponse.result && data.quoteResponse.result.length > 0) {
+                    const quote = data.quoteResponse.result[0];
+                    
+                    const currentPrice = quote.regularMarketPrice || quote.bid || quote.ask;
+                    const change = quote.regularMarketChange || 0;
+                    const changePercent = quote.regularMarketChangePercent || 0;
+                    
+                    if (currentPrice && currentPrice > 0) {
+                        apiStats.yahoo.success++;
+                        log(`✅ Yahoo Proxy: ${symbol} = $${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
+                        
+                        return {
+                            price: currentPrice,
+                            change: change,
+                            changePercent: changePercent,
+                            isLive: true,
+                            source: 'Yahoo-Proxy'
+                        };
+                    }
+                }
+                throw new Error('Invalid data');
+            } catch (error) {
+                apiStats.yahoo.failed++;
+                log(`❌ Yahoo Proxy: ${symbol} failed - ${error.message}`);
+                return null;
+            }
+        }
+
+        // ============= TWELVEDATA API =============
+        async function fetchFromTwelveData(symbol) {
+            try {
+                checkApiUsageReset();
+                
+                // Check rate limit
+                if (apiUsage.twelvedata.count >= 800) {
+                    log(`⚠️ TwelveData: Daily limit reached (800 calls)`);
+                    return null;
+                }
+                
+                // Convert symbol format
+                let tdSymbol = symbol;
+                if (symbol === 'CL=F') tdSymbol = 'CL';
+                else if (symbol === 'NG=F') tdSymbol = 'NG';
+                else if (symbol === 'BZ=F') tdSymbol = 'BZ';
+                
+                const url = `https://api.twelvedata.com/quote?symbol=${tdSymbol}&apikey=${API_KEYS.TWELVEDATA}`;
+                
+                log(`🔄 TwelveData: Fetching ${symbol} (${tdSymbol})`);
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.price && !data.code) {
+                    const currentPrice = parseFloat(data.price);
+                    const previousClose = parseFloat(data.previous_close) || currentPrice;
+                    const change = currentPrice - previousClose;
+                    const changePercent = (change / previousClose) * 100;
+                    
+                    apiStats.twelvedata.success++;
+                    apiUsage.twelvedata.count++;
+                    updateApiUsageDisplay();
+                    
+                    log(`✅ TwelveData: ${symbol} = $${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
+                    
+                    return {
+                        price: currentPrice,
+                        change: change,
+                        changePercent: changePercent,
+                        isLive: true,
+                        source: 'TwelveData'
+                    };
+                } else {
+                    throw new Error(data.message || 'Invalid data');
+                }
+            } catch (error) {
+                apiStats.twelvedata.failed++;
+                log(`❌ TwelveData: ${symbol} failed - ${error.message}`);
+                return null;
+            }
+        }
+
+        // ============= FINNHUB API =============
+        async function fetchFromFinnhub(symbol) {
+            try {
+                const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEYS.FINNHUB}`;
+                
+                log(`🔄 Finnhub: Fetching ${symbol}`);
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.c && data.c > 0) {
+                    const change = data.d || 0;
+                    const changePercent = data.dp || 0;
+                    
+                    apiStats.finnhub.success++;
+                    log(`✅ Finnhub: ${symbol} = $${data.c.toFixed(2)} (${changePercent.toFixed(2)}%)`);
+                    
+                    return {
+                        price: data.c,
+                        change: change,
+                        changePercent: changePercent,
+                        isLive: true,
+                        source: 'Finnhub'
+                    };
+                } else {
+                    throw new Error('Invalid data format');
+                }
+            } catch (error) {
+                apiStats.finnhub.failed++;
+                log(`❌ Finnhub: ${symbol} failed - ${error.message}`);
+                return null;
+            }
+        }
+
+        // ============= NEWS APIS =============
+        async function fetchFromCurrentsAPI() {
+            try {
+                checkApiUsageReset();
+                
+                if (apiUsage.currents.count >= 600) {
+                    log(`⚠️ CurrentsAPI: Daily limit reached`);
+                    return null;
+                }
+                
+                const url = `https://api.currentsapi.services/v1/latest-news?keywords=oil,gas,energy&language=en&apiKey=${API_KEYS.CURRENTS}`;
+                
+                log(`🔄 CurrentsAPI: Fetching energy news`);
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.news && data.news.length > 0) {
+                    const newsItems = data.news.slice(0, 6).map(item => ({
+                        title: item.title,
+                        url: item.url,
+                        source: 'CurrentsAPI',
+                        time: item.published
+                    }));
+                    
+                    apiStats.currents.success++;
+                    apiUsage.currents.count++;
+                    updateApiUsageDisplay();
+                    
+                    log(`✅ CurrentsAPI: Loaded ${newsItems.length} articles`);
+                    return newsItems;
+                } else {
+                    throw new Error('No news data');
+                }
+            } catch (error) {
+                apiStats.currents.failed++;
+                log(`❌ CurrentsAPI failed: ${error.message}`);
+                return null;
+            }
+        }
+
+        async function fetchFromGNews() {
+            try {
+                checkApiUsageReset();
+                
+                if (apiUsage.gnews.count >= 100) {
+                    log(`⚠️ GNews: Daily limit reached`);
+                    return null;
+                }
+                
+                const url = `https://gnews.io/api/v4/search?q=oil%20OR%20gas%20OR%20energy&lang=en&max=6&apikey=${API_KEYS.GNEWS}`;
+                
+                log(`🔄 GNews: Fetching energy news`);
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.articles && data.articles.length > 0) {
+                    const newsItems = data.articles.map(item => ({
+                        title: item.title,
+                        url: item.url,
+                        source: 'GNews',
+                        time: item.publishedAt
+                    }));
+                    
+                    apiStats.gnews.success++;
+                    apiUsage.gnews.count++;
+                    
+                    log(`✅ GNews: Loaded ${newsItems.length} articles`);
+                    return newsItems;
+                } else {
+                    throw new Error('No news data');
+                }
+            } catch (error) {
+                apiStats.gnews.failed++;
+                log(`❌ GNews failed: ${error.message}`);
+                return null;
+            }
+        }
+
+        async function fetchFromMediastack() {
+            try {
+                checkApiUsageReset();
+                
+                if (apiUsage.mediastack.count >= 16) {
+                    log(`⚠️ Mediastack: Daily limit reached`);
+                    return null;
+                }
+                
+                const url = `http://api.mediastack.com/v1/news?access_key=${API_KEYS.MEDIASTACK}&keywords=oil,gas,energy&languages=en&limit=6`;
+                
+                log(`🔄 Mediastack: Fetching energy news`);
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data.data && data.data.length > 0) {
+                    const newsItems = data.data.map(item => ({
+                        title: item.title,
+                        url: item.url,
+                        source: 'Mediastack',
+                        time: item.published_at
+                    }));
+                    
+                    apiStats.mediastack.success++;
+                    apiUsage.mediastack.count++;
+                    
+                    log(`✅ Mediastack: Loaded ${newsItems.length} articles`);
+                    return newsItems;
+                } else {
+                    throw new Error('No news data');
+                }
+            } catch (error) {
+                apiStats.mediastack.failed++;
+                log(`❌ Mediastack failed: ${error.message}`);
+                return null;
+            }
+        }
+
+        async function fetchEnhancedNews() {
+            log('📰 Fetching news from multiple sources...');
+            updateNewsStatus('🔍 Loading energy news from multiple feeds...');
+            
+            let allNews = [];
+            
+            // Try primary news sources first
+            const currentsNews = await fetchFromCurrentsAPI();
+            if (currentsNews) allNews = [...allNews, ...currentsNews];
+            
+            const gnewsItems = await fetchFromGNews();
+            if (gnewsItems) allNews = [...allNews, ...gnewsItems];
+            
+            // Only use Mediastack if we need more news
+            if (allNews.length < 8) {
+                const mediastackNews = await fetchFromMediastack();
+                if (mediastackNews) allNews = [...allNews, ...mediastackNews];
+            }
+            
+            if (allNews.length > 0) {
+                displayNews(allNews.slice(0, 12));
+                updateNewsStatus(`✅ Loaded ${allNews.length} live energy headlines`);
+                log(`✅ Total news items loaded: ${allNews.length}`);
+            } else {
+                updateNewsStatus('❌ Live news unavailable - showing energy examples');
+                displayFallbackNews();
+            }
+        }
+
+        function displayNews(newsItems) {
+            const container = document.getElementById('newsContainer');
+            if (!container) return;
+            
+            const newsHtml = newsItems.map(item => `
+                <div class="news-item">
+                    <div class="news-title">${item.title}</div>
+                    <div class="news-source">
+                        <span>${item.source}</span>
+                        <a href="${item.url}" target="_blank" class="news-link">Read More</a>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = newsHtml;
+        }
+
+        function displayFallbackNews() {
+            const fallbackNews = [
+                { title: 'Federal Pipeline Infrastructure Regulations Face Legal Challenge from Energy Groups', source: 'Energy Policy Watch', url: 'https://example.com' },
+                { title: 'Natural Gas Drilling Operations in Permian Basin Under New Regulatory Scrutiny', source: 'Oil & Gas Journal', url: 'https://example.com' },
+                { title: 'Data Center Energy Demand Drives New Natural Gas Pipeline Projects', source: 'Infrastructure Today', url: 'https://example.com' },
+                { title: 'Oil and Gas E&P Companies Challenge State Environmental Policies in Court', source: 'Petroleum News', url: 'https://example.com' },
+                { title: 'Wellhead Safety Regulations Updated Following Industry Compliance Review', source: 'Drilling Contractor', url: 'https://example.com' },
+                { title: 'Crude Oil Pipeline Litigation Reaches Federal Appeals Court Level', source: 'Energy Legal News', url: 'https://example.com' }
+            ];
+            displayNews(fallbackNews);
+        }
+
+        function updateNewsStatus(message) {
+            const element = document.getElementById('newsStatus');
+            if (element) {
+                element.textContent = message;
+            }
+        }
+
+        // ============= DISPLAY FUNCTIONS =============
+        function formatPrice(price, symbol) {
+            if (symbol.includes('=F')) {
+                if (symbol === 'NG=F') return '$' + price.toFixed(3) + '/MMBtu';
+                else if (symbol === 'CL=F' || symbol === 'BZ=F') return '$' + price.toFixed(2) + '/bbl';
+            }
+            return '$' + price.toFixed(2);
+        }
+
+        function formatChange(change, changePercent) {
+            const changeStr = (change >= 0 ? '+' : '') + change.toFixed(2);
+            const percentStr = (changePercent >= 0 ? '+' : '') + changePercent.toFixed(2) + '%';
+            return { changeStr, percentStr };
+        }
+
+        function renderPriceCards(symbols, containerId, cardClass, chartType = 'company') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const html = symbols.map(symbol => {
+                const data = priceData[symbol];
+                if (!data) return '';
+                
+                const { changeStr, percentStr } = formatChange(data.change, data.changePercent);
+                const isPositive = data.change >= 0;
+                const statusClass = isUpdating ? (data.isLive ? 'status-live' : 'status-error') : 'status-error';
+                const dataSource = data.isLive ? `📡 ${data.source || 'LIVE'}` : '📊 SIM';
+                
+                // Conditional formatting for major moves
+                let majorMoveClass = '';
+                if (Math.abs(data.changePercent) > 3) {
+                    majorMoveClass = data.changePercent > 0 ? 'major-gain' : 'major-loss';
+                }
+                
+                return `
+                    <div class="price-card ${cardClass} ${majorMoveClass}" data-symbol="${symbol}" 
+                         onmouseenter="showTooltip(event, '${symbol}', ${JSON.stringify(data).replace(/"/g, '&quot;')})"
+                         onmouseleave="hideTooltip()"
+                         onclick="toggleExpandCard(this)">
+                        <div class="symbol">
+                            ${symbol} <span style="font-size: 0.7em; opacity: 0.7;">${dataSource}</span>
+                            <span class="status-indicator ${statusClass}"></span>
+                        </div>
+                        <div class="company-name">${data.name}</div>
+                        <div class="price">${formatPrice(data.price, symbol)}</div>
+                        <div class="change ${isPositive ? 'positive' : 'negative'}">
+                            <span class="change-amount">${changeStr}</span>
+                            <span class="change-percent">${percentStr}</span>
+                        </div>
+                        <div class="price-chart">${createAdvancedChart(symbol, chartType)}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+            
+            // Enable drag and drop after rendering
+            setTimeout(enableDragAndDrop, 100);
+        }
+
+        function toggleExpandCard(cardElement) {
+            if (expandedCard && expandedCard !== cardElement) {
+                expandedCard.classList.remove('expanded');
+            }
+            
+            cardElement.classList.toggle('expanded');
+            expandedCard = cardElement.classList.contains('expanded') ? cardElement : null;
+        }
+
+        function updateMarketSummary() {
+            try {
+                const allData = Object.values(priceData).filter(d => d && typeof d.changePercent === 'number');
+                if (allData.length === 0) return;
+                
+                // Energy sector (companies + services)
+                const stockSymbols = [...companies, ...services];
+                const stockData = stockSymbols.map(s => priceData[s]).filter(d => d && typeof d.changePercent === 'number');
+                const energyAvg = stockData.length > 0 ? 
+                    stockData.reduce((sum, d) => sum + d.changePercent, 0) / stockData.length : 0;
+                
+                // Commodities average
+                const commodityData = commodities.map(s => priceData[s]).filter(d => d && typeof d.changePercent === 'number');
+                const commoditiesAvg = commodityData.length > 0 ? 
+                    commodityData.reduce((sum, d) => sum + d.changePercent, 0) / commodityData.length : 0;
+                
+                // Top gainer and loser
+                const topGainer = allData.reduce((max, d) => d.changePercent > max.changePercent ? d : max, allData[0]);
+                const topLoser = allData.reduce((min, d) => d.changePercent < min.changePercent ? d : min, allData[0]);
+                
+                // Oil-Gas correlation
+                const oilData = priceData['CL=F'];
+                const gasData = priceData['NG=F'];
+                let correlation = 'N/A';
+                if (oilData && gasData && typeof oilData.changePercent === 'number' && typeof gasData.changePercent === 'number') {
+                    correlation = (oilData.changePercent * gasData.changePercent > 0) ? 'Positive' : 'Negative';
+                }
+                
+                // Update display
+                document.getElementById('energySector').innerHTML = `<span class="${energyAvg >= 0 ? 'positive' : 'negative'}">${energyAvg.toFixed(2)}%</span>`;
+                document.getElementById('commoditiesAvg').innerHTML = `<span class="${commoditiesAvg >= 0 ? 'positive' : 'negative'}">${commoditiesAvg.toFixed(2)}%</span>`;
+                document.getElementById('topGainer').innerHTML = `<span class="positive">${topGainer.symbol} ${topGainer.changePercent.toFixed(2)}%</span>`;
+                document.getElementById('topLoser').innerHTML = `<span class="negative">${topLoser.symbol} ${topLoser.changePercent.toFixed(2)}%</span>`;
+                document.getElementById('correlation').textContent = correlation;
+            } catch (error) {
+                log(`❌ Error updating market summary: ${error.message}`);
+            }
+        }
+
+        // ============= OPTIMIZED UPDATE FUNCTIONS =============
+        async function updateStocks() {
+            log('📈 Updating stocks (2-min cycle)...');
+            updateStatus('📈 Updating stock prices...');
+            let liveCount = 0;
+            
+            for (const symbol of [...companies, ...services]) {
+                let data = await fetchFromFinnhub(symbol);
+                
+                if (!data) {
+                    data = await fetchFromYahooWithProxy(symbol);
+                }
+                
+                if (data) {
+                    priceData[symbol] = {
+                        ...data,
+                        name: getAssetName(symbol),
+                        symbol: symbol
+                    };
+                    liveCount++;
+                } else {
+                    // Use realistic simulation
+                    const lastPrice = priceHistory[symbol] && priceHistory[symbol].length > 0 ? 
+                        priceHistory[symbol][priceHistory[symbol].length - 1] : null;
+                    const simulatedData = generateRealisticPrice(symbol, lastPrice);
+                    
+                    priceData[symbol] = {
+                        ...simulatedData,
+                        name: getAssetName(symbol),
+                        symbol: symbol
+                    };
+                }
+                
+                // Update price history
+                if (!priceHistory[symbol]) priceHistory[symbol] = [];
+                priceHistory[symbol].push(priceData[symbol].price);
+                if (priceHistory[symbol].length > 30) {
+                    priceHistory[symbol].shift();
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 50)); // Small delay
+            }
+            
+            renderPriceCards(companies, 'companiesGrid', 'company-card', 'company');
+            renderPriceCards(services, 'servicesGrid', 'company-card services-card', 'services');
+            updateMarketSummary();
+            
+            REFRESH_CONFIG.stocks.lastUpdate = Date.now();
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+            
+            const statusMessage = `✅ Stocks: ${liveCount}/${[...companies, ...services].length} live`;
+            updateStatus(statusMessage);
+            updateApiStats();
+            log(`✅ Stock update complete: ${liveCount} live`);
+        }
+
+        async function updateCommodities() {
+            log('🛢️ Updating commodities (10-min cycle)...');
+            updateStatus('🛢️ Updating commodity prices...');
+            let liveCount = 0;
+            
+            for (const symbol of commodities) {
+                let data = await fetchFromTwelveData(symbol);
+                
+                if (!data) {
+                    data = await fetchFromYahooWithProxy(symbol);
+                }
+                
+                if (data) {
+                    priceData[symbol] = {
+                        ...data,
+                        name: getAssetName(symbol),
+                        symbol: symbol
+                    };
+                    liveCount++;
+                } else {
+                    // Use realistic simulation
+                    const lastPrice = priceHistory[symbol] && priceHistory[symbol].length > 0 ? 
+                        priceHistory[symbol][priceHistory[symbol].length - 1] : null;
+                    const simulatedData = generateRealisticPrice(symbol, lastPrice);
+                    
+                    priceData[symbol] = {
+                        ...simulatedData,
+                        name: getAssetName(symbol),
+                        symbol: symbol
+                    };
+                }
+                
+                // Update price history
+                if (!priceHistory[symbol]) priceHistory[symbol] = [];
+                priceHistory[symbol].push(priceData[symbol].price);
+                if (priceHistory[symbol].length > 30) {
+                    priceHistory[symbol].shift();
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 100)); // Small delay
+            }
+            
+            renderPriceCards(commodities, 'commoditiesGrid', 'commodity-card', 'commodity');
+            updateMarketSummary();
+            
+            REFRESH_CONFIG.commodities.lastUpdate = Date.now();
+            
+            const statusMessage = `✅ Commodities: ${liveCount}/${commodities.length} live`;
+            updateStatus(statusMessage);
+            updateApiStats();
+            log(`✅ Commodity update complete: ${liveCount} live`);
+        }
+
+        async function updateNews() {
+            log('📰 Updating news (10-min cycle)...');
+            await fetchEnhancedNews();
+            REFRESH_CONFIG.news.lastUpdate = Date.now();
+        }
+
+        // ============= CONTROL FUNCTIONS =============
+        function addSymbol() {
+            const input = document.getElementById('symbolInput');
+            const symbol = input.value.trim().toUpperCase();
+            
+            if (symbol && !allSymbols.includes(symbol)) {
+                if (symbol.includes('=F')) {
+                    commodities.push(symbol);
+                } else if (['SLB', 'HAL', 'BKR'].some(s => symbol.includes(s))) {
+                    services.push(symbol);
+                } else {
+                    companies.push(symbol);
+                }
+                allSymbols.push(symbol);
+                priceHistory[symbol] = [];
+                volumeData[symbol] = [];
+                input.value = '';
+                
+                // Update the appropriate category
+                if (symbol.includes('=F')) {
+                    updateCommodities();
+                } else {
+                    updateStocks();
+                }
+                
+                log(`➕ Added symbol: ${symbol}`);
+            }
+        }
+
+        function toggleUpdates() {
+            const btn = document.getElementById('toggleBtn');
+            isUpdating = !isUpdating;
+            
+            if (isUpdating) {
+                btn.textContent = '⏸️ Pause';
+                startIntervals();
+                updateStatus('🔄 Live updates resumed');
+            } else {
+                btn.textContent = '▶️ Resume';
+                stopIntervals();
+                updateStatus('⏸️ Updates paused');
+            }
+            log(`${isUpdating ? '▶️ Resumed' : '⏸️ Paused'} updates`);
+        }
+
+        function refreshAll() {
+            log('🔄 Manual refresh triggered for all data');
+            updateStocks();
+            updateCommodities();
+            updateNews();
+        }
+
+        function startIntervals() {
+            stockInterval = setInterval(updateStocks, REFRESH_CONFIG.stocks.interval);
+            commodityInterval = setInterval(updateCommodities, REFRESH_CONFIG.commodities.interval);
+            newsInterval = setInterval(updateNews, REFRESH_CONFIG.news.interval);
+        }
+
+        function stopIntervals() {
+            clearInterval(stockInterval);
+            clearInterval(commodityInterval);
+            clearInterval(newsInterval);
+        }
+
+        // ============= INITIALIZATION =============
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Professional Energy Terminal starting...');
+            
+            // Set up event listeners
+            document.getElementById('symbolInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addSymbol();
+                }
+            });
+
+            // Start the application
+            updateStatus('🔌 Connecting to professional data sources...');
+            
+            // Initial data load
+            updateStocks();
+            updateCommodities();
+            updateNews();
+            
+            // Set up optimized intervals
+            startIntervals();
+            
+            log('✅ Professional terminal ready with optimized refresh rates');
+            log('📊 Stocks: 2min | 🛢️ Commodities: 10min | 📰 News: 10min');
+        });
+    </script>
 </body>
 </html>
