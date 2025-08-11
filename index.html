@@ -277,10 +277,15 @@
             text-decoration: none;
             font-weight: 500;
             transition: color 0.2s ease;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
         }
 
         .news-link:hover {
             color: var(--energy-green);
+            background: rgba(0, 212, 170, 0.1);
         }
 
         /* Professional Section Headers */
@@ -1088,7 +1093,7 @@
                     
                     const newsItems = recentNews.map(item => ({
                         title: item.title,
-                        url: item.url,
+                        url: item.url || '#',
                         source: item.author || 'CurrentsAPI',
                         time: item.published,
                         daysAgo: Math.floor((Date.now() - new Date(item.published)) / (1000 * 60 * 60 * 24))
@@ -1097,6 +1102,10 @@
                     if (newsItems.length > 0) {
                         apiStats.currents.success++;
                         log(`✅ CurrentsAPI: Loaded ${newsItems.length} recent articles`);
+                        // Debug log first URL
+                        if (newsItems[0].url) {
+                            log(`First article URL: ${newsItems[0].url.substring(0, 50)}...`);
+                        }
                         return newsItems;
                     }
                 }
@@ -1252,13 +1261,32 @@
                     new Map(allNews.map(item => [item.title, item])).values()
                 ).sort((a, b) => new Date(b.time) - new Date(a.time));
                 
-                displayNews(uniqueNews.slice(0, 12));
-                updateNewsStatus(`✅ Showing ${uniqueNews.length} articles from the past week`);
-                log(`✅ Total recent news items loaded: ${uniqueNews.length}`);
+                // Validate URLs before display
+                const validatedNews = uniqueNews.map(item => ({
+                    ...item,
+                    url: validateUrl(item.url)
+                }));
+                
+                displayNews(validatedNews.slice(0, 12));
+                updateNewsStatus(`✅ Showing ${validatedNews.length} articles from the past week`);
+                log(`✅ Total recent news items loaded: ${validatedNews.length}`);
             } else {
                 updateNewsStatus('❌ No recent news available - showing examples');
                 displayFallbackNews();
             }
+        }
+        
+        function validateUrl(url) {
+            if (!url || url === '#' || url === 'null' || url === 'undefined') {
+                return '#';
+            }
+            
+            // If URL doesn't start with http:// or https://, add https://
+            if (!url.match(/^https?:\/\//i)) {
+                return 'https://' + url;
+            }
+            
+            return url;
         }
 
         function displayNews(newsItems) {
@@ -1275,12 +1303,17 @@
                     timeDisplay = `${item.daysAgo} days ago`;
                 }
                 
+                const isValidUrl = item.url && item.url !== '#';
+                
                 return `
                     <div class="news-item">
                         <div class="news-title">${item.title}</div>
                         <div class="news-source">
                             <span>${item.source} • ${timeDisplay}</span>
-                            <a href="${item.url}" target="_blank" class="news-link">Read More</a>
+                            ${isValidUrl ? 
+                                `<a href="${item.url}" target="_blank" rel="noopener noreferrer" class="news-link">Read More →</a>` : 
+                                '<span style="color: var(--text-tertiary); font-size: 0.85em;">No link available</span>'
+                            }
                         </div>
                     </div>
                 `;
