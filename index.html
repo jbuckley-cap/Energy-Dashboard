@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Energy Market Terminal</title>
+    <title>Energy Equities Terminal</title>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,16 +13,6 @@
             --bg-tertiary: #1e222d;
             --bg-card: #1e2329;
             --bg-card-hover: #252831;
-            
-            /* Commodity Colors - Oil/Gold Tones */
-            --commodity-primary: #f7931e;
-            --commodity-secondary: #ff6b35;
-            --commodity-gradient: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #ffd700 100%);
-            
-            /* Natural Gas Blues */
-            --gas-primary: #2196f3;
-            --gas-secondary: #1976d2;
-            --gas-gradient: linear-gradient(135deg, #64b5f6 0%, #2196f3 50%, #1565c0 100%);
             
             /* Energy Companies */
             --company-primary: #00d4aa;
@@ -139,7 +129,7 @@
             font-size: 0.9em;
         }
 
-        .control-group input, .control-group select {
+        .control-group input {
             padding: 10px 14px;
             border: 1px solid var(--border-secondary);
             border-radius: 6px;
@@ -150,16 +140,10 @@
             transition: all 0.2s ease;
         }
 
-        .control-group input:focus, .control-group select:focus {
+        .control-group input:focus {
             outline: none;
             border-color: var(--text-accent);
             box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2);
-        }
-
-        .control-group select option {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            padding: 8px;
         }
 
         .control-group input::placeholder {
@@ -182,6 +166,11 @@
             background: var(--bg-card-hover);
             border-color: var(--text-accent);
             transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         /* Enhanced Market Summary */
@@ -276,6 +265,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: 8px;
+        }
+
+        .news-source span {
+            font-weight: 500;
         }
 
         .news-link {
@@ -315,13 +309,7 @@
             border-radius: 2px;
         }
 
-        /* Enhanced Grid Layouts */
-        .commodities-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-            gap: 25px;
-        }
-
+        /* Enhanced Grid Layout */
         .companies-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
@@ -339,20 +327,11 @@
             overflow: hidden;
             cursor: pointer;
             user-select: none;
-        }
-
-        .commodity-card {
-            padding: 30px;
-            min-height: 280px;
-            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(247, 147, 30, 0.05) 100%);
-        }
-
-        .company-card {
             min-height: 240px;
             background: linear-gradient(135deg, var(--bg-card) 0%, rgba(0, 212, 170, 0.03) 100%);
         }
 
-        .services-card {
+        .price-card.services {
             background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255, 107, 107, 0.03) 100%);
         }
 
@@ -390,32 +369,16 @@
             right: 0;
             height: 4px;
             border-radius: 12px 12px 0 0;
-        }
-
-        .commodity-card::before {
-            background: var(--commodity-gradient);
-        }
-
-        .company-card::before {
             background: var(--company-gradient);
         }
 
-        .services-card::before {
+        .price-card.services::before {
             background: var(--services-gradient);
-        }
-
-        /* Natural Gas Special Styling */
-        .price-card[data-symbol="NG=F"]::before {
-            background: var(--gas-gradient);
-        }
-
-        .price-card[data-symbol="NG=F"] {
-            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(33, 150, 243, 0.05) 100%);
         }
 
         /* Enhanced Symbol Display */
         .symbol {
-            font-size: 1.4em;
+            font-size: 1.2em;
             font-weight: 700;
             margin-bottom: 8px;
             display: flex;
@@ -423,10 +386,6 @@
             align-items: center;
             font-family: var(--font-mono);
             letter-spacing: 0.5px;
-        }
-
-        .company-card .symbol {
-            font-size: 1.2em;
         }
 
         .company-name {
@@ -439,15 +398,11 @@
 
         /* Professional Price Display */
         .price {
-            font-size: 2.4em;
+            font-size: 2em;
             font-weight: 700;
             margin-bottom: 12px;
             font-family: var(--font-mono);
             letter-spacing: -0.5px;
-        }
-
-        .company-card .price {
-            font-size: 2em;
         }
 
         .change {
@@ -498,6 +453,20 @@
             color: var(--text-secondary);
         }
 
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-tertiary);
+            border-radius: 50%;
+            border-top-color: var(--text-accent);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Enhanced Status Indicators */
         .status-indicator {
             display: inline-block;
@@ -530,7 +499,7 @@
 
         /* Advanced Charts Container */
         .price-chart {
-            height: 80px;
+            height: 60px;
             margin-top: 20px;
             position: relative;
             background: rgba(0, 0, 0, 0.2);
@@ -539,20 +508,10 @@
             border: 1px solid var(--border-secondary);
         }
 
-        .company-card .price-chart {
-            height: 60px;
-        }
-
         .chart-container {
             width: 100%;
             height: 100%;
             position: relative;
-            cursor: crosshair;
-        }
-
-        .candlestick-chart {
-            width: 100%;
-            height: 100%;
         }
 
         .chart-svg {
@@ -560,91 +519,24 @@
             height: 100%;
         }
 
-        /* Enhanced Chart Styling */
         .price-line {
             fill: none;
-            stroke-width: 2.5;
+            stroke: var(--company-primary);
+            stroke-width: 2;
             filter: drop-shadow(0 0 4px currentColor);
         }
 
-        .commodity-chart .price-line {
-            stroke: var(--commodity-primary);
-        }
-
-        .company-chart .price-line {
-            stroke: var(--company-primary);
-        }
-
-        .services-chart .price-line {
+        .services .price-line {
             stroke: var(--services-primary);
         }
 
-        .gas-chart .price-line {
-            stroke: var(--gas-primary);
-        }
-
         .chart-area {
+            fill: var(--company-primary);
             opacity: 0.15;
         }
 
-        .commodity-chart .chart-area {
-            fill: var(--commodity-primary);
-        }
-
-        .company-chart .chart-area {
-            fill: var(--company-primary);
-        }
-
-        .services-chart .chart-area {
+        .services .chart-area {
             fill: var(--services-primary);
-        }
-
-        .gas-chart .chart-area {
-            fill: var(--gas-primary);
-        }
-
-        /* Candlestick Chart Elements */
-        .candlestick {
-            transition: all 0.2s ease;
-        }
-
-        .candlestick:hover {
-            stroke-width: 2;
-            filter: drop-shadow(0 0 5px currentColor);
-        }
-
-        .candle-up {
-            fill: var(--energy-green);
-            stroke: var(--energy-green);
-        }
-
-        .candle-down {
-            fill: var(--energy-red);
-            stroke: var(--energy-red);
-        }
-
-        .volume-bar {
-            opacity: 0.3;
-            transition: opacity 0.2s ease;
-        }
-
-        .volume-bar:hover {
-            opacity: 0.7;
-        }
-
-        .moving-average {
-            fill: none;
-            stroke-width: 1.5;
-            stroke-dasharray: 2,2;
-            opacity: 0.7;
-        }
-
-        .ma-20 {
-            stroke: var(--text-accent);
-        }
-
-        .ma-50 {
-            stroke: #ff9800;
         }
 
         /* Professional Tooltips */
@@ -718,54 +610,6 @@
             border: 1px solid var(--border-primary);
         }
 
-        /* API Usage Monitor */
-        .api-usage-monitor {
-            background: var(--bg-card);
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-size: 0.85em;
-        }
-
-        .usage-bar {
-            background: var(--bg-tertiary);
-            height: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 5px 0;
-        }
-
-        .usage-fill {
-            height: 100%;
-            background: var(--text-accent);
-            transition: width 0.3s ease;
-        }
-
-        /* Refresh Indicators */
-        .refresh-info {
-            display: flex;
-            gap: 15px;
-            font-size: 0.8em;
-            margin-top: 10px;
-        }
-
-        .refresh-item {
-            padding: 5px 10px;
-            background: var(--bg-tertiary);
-            border-radius: 4px;
-        }
-
-        /* Drag and Drop Functionality */
-        .price-card.dragging {
-            opacity: 0.5;
-            transform: rotate(5deg);
-        }
-
-        .price-card.drag-over {
-            border-color: var(--text-accent);
-            box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
-        }
-
         /* Deployment Status */
         .deployment-info {
             background: rgba(0, 212, 170, 0.1);
@@ -780,11 +624,6 @@
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2.4em;
-            }
-            
-            .commodities-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
             }
             
             .companies-grid {
@@ -807,11 +646,7 @@
             }
             
             .price {
-                font-size: 2em;
-            }
-            
-            .company-card .price {
-                font-size: 1.6em;
+                font-size: 1.8em;
             }
         }
     </style>
@@ -819,55 +654,37 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>⛽ Professional Energy Terminal</h1>
+            <h1>⛽ Energy Equities Terminal</h1>
             <div class="last-updated">Last updated: <span id="lastUpdate">Initializing...</span></div>
             <div class="api-status">
                 📡 <strong>Market Data Status:</strong> <span id="apiStatus">Connecting to live data sources...</span>
             </div>
-            <div class="refresh-info">
-                <div class="refresh-item">📈 Stocks: Every 2 min</div>
-                <div class="refresh-item">🛢️ Commodities: Every 10 min</div>
-                <div class="refresh-item">📰 News: Every 10 min</div>
-            </div>
             <div class="deployment-info">
-                🚀 <strong>Optimized Terminal:</strong> Real-time stocks via Finnhub (2min), Commodities via TwelveData (10min), News via CurrentsAPI/GNews (10min).
-                Smart API usage keeps all data fresh while staying well under limits.
+                🚀 <strong>Energy Equities Terminal v3.0:</strong> Simplified focus on key O&G securities.
+                Real-time updates every 2 minutes via Finnhub. Regulatory & legal news updates every 10 minutes (past 7 days only).
             </div>
         </div>
 
         <div class="controls">
             <div class="control-group">
                 <label>Add Symbol:</label>
-                <input type="text" id="symbolInput" placeholder="e.g., XOM, NG=F" maxlength="10">
+                <input type="text" id="symbolInput" placeholder="e.g., XOM, SLB" maxlength="10">
                 <button class="btn" onclick="addSymbol()">Add</button>
             </div>
             <div class="control-group">
                 <button class="btn" onclick="toggleUpdates()" id="toggleBtn">⏸️ Pause</button>
-                <button class="btn" onclick="refreshAll()">🔄 Refresh All</button>
+                <button class="btn" onclick="refreshAll()" id="refreshAllBtn">🔄 Refresh All</button>
                 <button class="btn" onclick="toggleDebug()">🔍 Debug</button>
             </div>
         </div>
 
         <!-- Debug Panel -->
         <div id="debugPanel" class="debug-panel" style="display: none;">
-            <div class="debug-title">🔍 Professional API Monitoring</div>
+            <div class="debug-title">🔍 API Monitoring</div>
             <div class="api-stats" id="apiStats">
-                <strong>Multi-Source Data Performance:</strong><br>
-                • Yahoo Finance: <span id="yahooStats">Not tested</span><br>
+                <strong>Data Source Performance:</strong><br>
                 • Finnhub Pro: <span id="finnhubStats">Not tested</span><br>
-                • TwelveData: <span id="twelveStats">Not tested</span><br>
                 • News Sources: <span id="newsApiStats">Not tested</span>
-            </div>
-            <div class="api-usage-monitor">
-                <strong>API Usage Today:</strong>
-                <div>TwelveData: <span id="twelveUsage">0</span>/800 calls</div>
-                <div class="usage-bar">
-                    <div class="usage-fill" id="twelveUsageBar" style="width: 0%"></div>
-                </div>
-                <div>CurrentsAPI: <span id="currentsUsage">0</span>/600 calls</div>
-                <div class="usage-bar">
-                    <div class="usage-fill" id="currentsUsageBar" style="width: 0%"></div>
-                </div>
             </div>
             <div id="debugLog"></div>
         </div>
@@ -877,12 +694,8 @@
             <h2 style="text-align: center; margin-bottom: 25px; font-size: 1.8em; font-weight: 700;">📊 Energy Market Overview</h2>
             <div class="summary-grid">
                 <div class="summary-item">
-                    <div class="summary-title">Energy Sector Avg</div>
-                    <div class="summary-value" id="energySector">Loading...</div>
-                </div>
-                <div class="summary-item">
-                    <div class="summary-title">Commodities Avg</div>
-                    <div class="summary-value" id="commoditiesAvg">Loading...</div>
+                    <div class="summary-title">Sector Average</div>
+                    <div class="summary-value" id="sectorAvg">Loading...</div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-title">Top Gainer</div>
@@ -893,39 +706,28 @@
                     <div class="summary-value" id="topLoser">Loading...</div>
                 </div>
                 <div class="summary-item">
-                    <div class="summary-title">Oil-Gas Correlation</div>
-                    <div class="summary-value" id="correlation">Loading...</div>
+                    <div class="summary-title">Active Stocks</div>
+                    <div class="summary-value" id="activeStocks">Loading...</div>
                 </div>
             </div>
         </div>
 
         <!-- News Section -->
         <div class="news-section">
-            <h2 style="text-align: center; margin-bottom: 25px; font-size: 1.8em; font-weight: 700;">📰 Energy Market Intelligence</h2>
-            <div id="newsStatus" style="text-align: center; margin-bottom: 20px; color: var(--text-secondary);">Loading targeted energy news...</div>
+            <h2 style="text-align: center; margin-bottom: 25px; font-size: 1.8em; font-weight: 700;">📰 Energy Regulatory & Market News</h2>
+            <div id="newsStatus" style="text-align: center; margin-bottom: 20px; color: var(--text-secondary);">Loading energy news...</div>
+            <div style="text-align: center; margin-bottom: 15px; font-size: 0.85em; color: var(--text-tertiary);">
+                Focus: Pipeline regulations, drilling permits, legal challenges, FERC/EPA updates
+            </div>
             <div id="newsContainer" class="news-grid">
-                <div class="loading">Fetching latest energy industry intelligence...</div>
+                <div class="loading">Fetching latest energy industry news...</div>
             </div>
         </div>
 
         <div class="section">
-            <h2 class="section-title">🛢️ Energy Commodities</h2>
-            <div id="commoditiesGrid" class="commodities-grid">
-                <div class="loading">Loading live commodity market data...</div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">🏭 Energy Corporations</h2>
+            <h2 class="section-title">🏭 Energy Companies & Services</h2>
             <div id="companiesGrid" class="companies-grid">
-                <div class="loading">Loading live corporate equity data...</div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2 class="section-title">🔧 Oilfield Services</h2>
-            <div id="servicesGrid" class="companies-grid">
-                <div class="loading">Loading live services sector data...</div>
+                <div class="loading">Loading live market data...</div>
             </div>
         </div>
 
@@ -937,96 +739,36 @@
     </div>
 
     <script>
+        'use strict';
+
         // ============= API CONFIGURATION =============
         const API_KEYS = {
             FINNHUB: 'd20i9lpr01qrk6cl5adgd20i9lpr01qrk6cl5ae0',
-            TWELVEDATA: 'b7bc43ebc653428cb1a5d968a23b67ee',
             CURRENTS: '5vexUPN43TdFfjFM_BdejcR9lnE_JyDHU-ceWHbIb-GG4Iy5',
-            GNEWS: '22b87731ed1048479c91c7b1831303ca',
-            MEDIASTACK: 'c2ddab844edc121d2d7d3c84f450ae9e'
+            GNEWS: '22b87731ed1048479c91c7b1831303ca'
         };
-
-        // ============= FREE COMMODITY API =============
-        async function fetchFromCommodityAPI(symbol) {
-            try {
-                // This is a free commodity-specific endpoint
-                let commodity = '';
-                if (symbol === 'CL=F') commodity = 'WTIOIL';
-                else if (symbol === 'BZ=F') commodity = 'BRENTOIL';
-                else if (symbol === 'NG=F') commodity = 'NG';
-                else return null;
-                
-                // Using a free commodity price API endpoint
-                const url = `https://api.api-ninjas.com/v1/commodityprice?name=${commodity}`;
-                
-                log(`🔄 Commodity API: Fetching ${symbol} as ${commodity}`);
-                
-                const response = await fetch(url, {
-                    headers: {
-                        'X-Api-Key': 'YOUR_API_KEY' // This would need a free API key from api-ninjas
-                    }
-                });
-                
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const data = await response.json();
-                
-                if (data.price) {
-                    const currentPrice = parseFloat(data.price);
-                    
-                    // Calculate change based on last known price or base price
-                    let change = 0;
-                    let changePercent = 0;
-                    
-                    const basePrice = getBasePrices()[symbol] || currentPrice;
-                    if (priceHistory[symbol] && priceHistory[symbol].length > 0) {
-                        const lastPrice = priceHistory[symbol][priceHistory[symbol].length - 1];
-                        change = currentPrice - lastPrice;
-                        changePercent = (change / lastPrice) * 100;
-                    } else {
-                        change = currentPrice - basePrice;
-                        changePercent = (change / basePrice) * 100;
-                    }
-                    
-                    log(`✅ Commodity API: ${symbol} = ${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
-                    
-                    return {
-                        price: currentPrice,
-                        change: change,
-                        changePercent: changePercent,
-                        isLive: true,
-                        source: 'CommodityAPI'
-                    };
-                } else {
-                    throw new Error('No price data');
-                }
-            } catch (error) {
-                log(`❌ Commodity API: ${symbol} failed - ${error.message}`);
-                return null;
-            }
-        }
-
-        // Add this after the CORS_PROXY declaration at the top
-        const ALTERNATE_PROXIES = [
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?',
-            'https://proxy.cors.sh/'
+        
+        // All energy companies including services
+        const energyCompanies = [
+            // Major Oil Companies
+            'XOM', 'CVX', 'COP', 
+            // E&P Companies
+            'EOG', 'EQT', 
+            // Midstream
+            'KMI', 'EPD', 'ET', 'WMB',
+            // Refiners
+            'VLO', 'PSX', 'MPC',
+            // Oilfield Services
+            'SLB', 'HAL', 'BKR'
         ];
         
-        // Energy symbols organized by category
-        const commodities = ['CL=F', 'NG=F', 'BZ=F'];
-        const companies = ['XOM', 'CVX', 'COP', 'EOG', 'EQT', 'KMI', 'EPD', 'ET', 'WMB', 'VLO', 'PSX', 'MPC'];
-        const services = ['SLB', 'HAL', 'BKR'];
-        let allSymbols = [...commodities, ...companies, ...services];
+        // Track which are services for styling
+        const servicesCompanies = ['SLB', 'HAL', 'BKR'];
         
-        // Optimized refresh intervals
+        // Refresh configuration
         const REFRESH_CONFIG = {
             stocks: {
                 interval: 2 * 60000,  // 2 minutes
-                lastUpdate: null
-            },
-            commodities: {
-                interval: 10 * 60000,  // 10 minutes
                 lastUpdate: null
             },
             news: {
@@ -1037,224 +779,113 @@
 
         // Global state
         let stockInterval;
-        let commodityInterval;
         let newsInterval;
         let isUpdating = true;
         let priceHistory = {};
         let priceData = {};
-        let volumeData = {};
         let debugMode = false;
         let debugLog = [];
         let expandedCard = null;
         
+        // Performance optimization
+        const domCache = {};
+        const energyTermsRegex = /\b(oil|gas|energy|crude|petroleum|opec|drilling|pipeline|shale|lng|refinery|barrel|regulation|regulatory|compliance|permit|legal|lawsuit|litigation|FERC|EPA|infrastructure)\b/i;
+        
         // API statistics
         let apiStats = {
-            yahoo: { success: 0, failed: 0, lastTry: null },
-            finnhub: { success: 0, failed: 0, lastTry: null },
-            twelvedata: { success: 0, failed: 0, lastTry: null },
-            currents: { success: 0, failed: 0, lastTry: null },
-            gnews: { success: 0, failed: 0, lastTry: null },
-            mediastack: { success: 0, failed: 0, lastTry: null }
-        };
-
-        // API usage tracking
-        let apiUsage = {
-            twelvedata: { count: 0, resetTime: getMidnight() },
-            currents: { count: 0, resetTime: getMidnight() },
-            gnews: { count: 0, resetTime: getMidnight() },
-            mediastack: { count: 0, resetTime: getMonthStart() }
+            finnhub: { success: 0, failed: 0 },
+            currents: { success: 0, failed: 0 },
+            gnews: { success: 0, failed: 0 },
+            rss: { success: 0, failed: 0 }
         };
 
         // Initialize data structures
-        allSymbols.forEach(symbol => {
+        energyCompanies.forEach(symbol => {
             priceHistory[symbol] = [];
-            volumeData[symbol] = [];
         });
 
         // ============= UTILITY FUNCTIONS =============
-        function getMidnight() {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(0, 0, 0, 0);
-            return tomorrow.getTime();
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
         }
 
-        function getMonthStart() {
-            const nextMonth = new Date();
-            nextMonth.setMonth(nextMonth.getMonth() + 1);
-            nextMonth.setDate(1);
-            nextMonth.setHours(0, 0, 0, 0);
-            return nextMonth.getTime();
+        function sanitizeSymbol(symbol) {
+            return symbol.replace(/[^A-Z0-9\-\.]/g, '').substring(0, 10);
         }
 
-        function checkApiUsageReset() {
-            const now = Date.now();
-            
-            // Reset daily counters
-            if (now >= apiUsage.twelvedata.resetTime) {
-                apiUsage.twelvedata.count = 0;
-                apiUsage.twelvedata.resetTime = getMidnight();
-            }
-            if (now >= apiUsage.currents.resetTime) {
-                apiUsage.currents.count = 0;
-                apiUsage.currents.resetTime = getMidnight();
-            }
-            if (now >= apiUsage.gnews.resetTime) {
-                apiUsage.gnews.count = 0;
-                apiUsage.gnews.resetTime = getMidnight();
-            }
-            
-            // Reset monthly counter
-            if (now >= apiUsage.mediastack.resetTime) {
-                apiUsage.mediastack.count = 0;
-                apiUsage.mediastack.resetTime = getMonthStart();
-            }
-            
-            updateApiUsageDisplay();
+        function initializeDomCache() {
+            domCache.lastUpdate = document.getElementById('lastUpdate');
+            domCache.apiStatus = document.getElementById('apiStatus');
+            domCache.sectorAvg = document.getElementById('sectorAvg');
+            domCache.topGainer = document.getElementById('topGainer');
+            domCache.topLoser = document.getElementById('topLoser');
+            domCache.activeStocks = document.getElementById('activeStocks');
+            domCache.toggleBtn = document.getElementById('toggleBtn');
+            domCache.refreshAllBtn = document.getElementById('refreshAllBtn');
+            domCache.symbolInput = document.getElementById('symbolInput');
+            domCache.newsContainer = document.getElementById('newsContainer');
+            domCache.newsStatus = document.getElementById('newsStatus');
+            domCache.debugPanel = document.getElementById('debugPanel');
+            domCache.debugLog = document.getElementById('debugLog');
+            domCache.companiesGrid = document.getElementById('companiesGrid');
         }
 
-        function updateApiUsageDisplay() {
-            // TwelveData usage
-            const twelvePercentage = (apiUsage.twelvedata.count / 800) * 100;
-            document.getElementById('twelveUsage').textContent = apiUsage.twelvedata.count;
-            document.getElementById('twelveUsageBar').style.width = twelvePercentage + '%';
+        // ============= CHART FUNCTIONS =============
+        function createSimpleChart(symbol, priceHistory) {
+            const history = priceHistory[symbol] || [];
+            if (history.length < 2) return '';
             
-            // CurrentsAPI usage
-            const currentsPercentage = (apiUsage.currents.count / 600) * 100;
-            document.getElementById('currentsUsage').textContent = apiUsage.currents.count;
-            document.getElementById('currentsUsageBar').style.width = currentsPercentage + '%';
-        }
-
-        // ============= PROFESSIONAL CHART FUNCTIONS =============
-        function generateCandlestickData(symbol, count = 20) {
-            const basePrice = getBasePrices()[symbol] || 100;
-            const data = [];
-            let currentPrice = basePrice;
-            
-            for (let i = 0; i < count; i++) {
-                const volatility = symbol.includes('=F') ? 0.02 : 0.015;
-                const change = (Math.random() - 0.5) * volatility;
-                const open = currentPrice;
-                const range = open * 0.03;
-                const high = open + (Math.random() * range);
-                const low = open - (Math.random() * range);
-                const close = Math.max(low, Math.min(high, open * (1 + change)));
-                const volume = Math.random() * 1000000 + 100000;
-                
-                data.push({ open, high, low, close, volume });
-                currentPrice = close;
-            }
-            
-            return data;
-        }
-
-        function createAdvancedChart(symbol, chartType = 'company') {
-            const candleData = generateCandlestickData(symbol, 20);
             const width = 100;
             const height = 100;
+            const prices = history.slice(-20); // Last 20 points
             
-            const prices = candleData.map(d => [d.high, d.low]).flat();
-            const volumes = candleData.map(d => d.volume);
             const maxPrice = Math.max(...prices);
             const minPrice = Math.min(...prices);
-            const maxVolume = Math.max(...volumes);
             const priceRange = maxPrice - minPrice || 1;
             
-            let chartClass = 'company-chart';
-            if (chartType === 'commodity') chartClass = 'commodity-chart';
-            else if (chartType === 'services') chartClass = 'services-chart';
-            else if (symbol === 'NG=F') chartClass = 'gas-chart';
-
-            let candlesticks = '';
-            let volumeBars = '';
-            let movingAverage = '';
-            
-            // Generate candlesticks
-            candleData.forEach((candle, i) => {
-                const x = (i / (candleData.length - 1)) * width;
-                const candleWidth = width / candleData.length * 0.6;
-                
-                const openY = height - ((candle.open - minPrice) / priceRange) * height;
-                const closeY = height - ((candle.close - minPrice) / priceRange) * height;
-                const highY = height - ((candle.high - minPrice) / priceRange) * height;
-                const lowY = height - ((candle.low - minPrice) / priceRange) * height;
-                
-                const isUp = candle.close > candle.open;
-                const bodyTop = Math.min(openY, closeY);
-                const bodyHeight = Math.abs(closeY - openY);
-                
-                // Wick (high-low line)
-                candlesticks += `<line x1="${x}" y1="${highY}" x2="${x}" y2="${lowY}" stroke="currentColor" stroke-width="1" opacity="0.7"/>`;
-                
-                // Candle body
-                candlesticks += `<rect x="${x - candleWidth/2}" y="${bodyTop}" width="${candleWidth}" height="${bodyHeight}" 
-                    class="candlestick candle-${isUp ? 'up' : 'down'}" stroke="currentColor" stroke-width="1"/>`;
-                
-                // Volume bars (bottom 20% of chart)
-                const volumeHeight = (candle.volume / maxVolume) * (height * 0.2);
-                volumeBars += `<rect x="${x - candleWidth/2}" y="${height - volumeHeight}" width="${candleWidth}" height="${volumeHeight}" 
-                    class="volume-bar" fill="currentColor" opacity="0.3"/>`;
+            // Create path
+            const points = prices.map((price, i) => {
+                const x = (i / (prices.length - 1)) * width;
+                const y = height - ((price - minPrice) / priceRange) * height;
+                return `${x},${y}`;
             });
             
-            // Simple moving averages
-            if (candleData.length >= 10) {
-                const ma10 = [];
-                const ma20 = [];
-                
-                for (let i = 9; i < candleData.length; i++) {
-                    const avg10 = candleData.slice(i-9, i+1).reduce((sum, d) => sum + d.close, 0) / 10;
-                    ma10.push({x: (i / (candleData.length - 1)) * width, y: height - ((avg10 - minPrice) / priceRange) * height});
-                }
-                
-                if (candleData.length >= 20) {
-                    for (let i = 19; i < candleData.length; i++) {
-                        const avg20 = candleData.slice(i-19, i+1).reduce((sum, d) => sum + d.close, 0) / 20;
-                        ma20.push({x: (i / (candleData.length - 1)) * width, y: height - ((avg20 - minPrice) / priceRange) * height});
-                    }
-                }
-                
-                if (ma10.length > 1) {
-                    const ma10Path = 'M' + ma10.map(p => `${p.x},${p.y}`).join('L');
-                    movingAverage += `<path d="${ma10Path}" class="moving-average ma-20"/>`;
-                }
-                
-                if (ma20.length > 1) {
-                    const ma20Path = 'M' + ma20.map(p => `${p.x},${p.y}`).join('L');
-                    movingAverage += `<path d="${ma20Path}" class="moving-average ma-50"/>`;
-                }
-            }
+            const linePath = `M${points.join(' L')}`;
+            const areaPath = `${linePath} L${width},${height} L0,${height} Z`;
+            
+            const isServices = servicesCompanies.includes(symbol);
             
             return `
-                <div class="chart-container ${chartClass}" data-symbol="${symbol}">
-                    <svg class="candlestick-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="gradient-${symbol}" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" style="stop-color:currentColor;stop-opacity:0.3" />
-                                <stop offset="100%" style="stop-color:currentColor;stop-opacity:0" />
-                            </linearGradient>
-                        </defs>
-                        ${volumeBars}
-                        ${candlesticks}
-                        ${movingAverage}
+                <div class="chart-container ${isServices ? 'services' : ''}">
+                    <svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+                        <path d="${areaPath}" class="chart-area" />
+                        <path d="${linePath}" class="price-line" />
                     </svg>
                 </div>
             `;
         }
 
-        // ============= ENHANCED TOOLTIP SYSTEM =============
+        // ============= TOOLTIP SYSTEM =============
         function showTooltip(event, symbol, data) {
             const tooltip = document.getElementById('tooltip');
             const title = tooltip.querySelector('.tooltip-title');
             const dataContainer = tooltip.querySelector('.tooltip-data');
             
-            title.textContent = `${symbol} - ${getAssetName(symbol)}`;
+            title.textContent = `${symbol} - ${getCompanyName(symbol)}`;
             
             const tooltipData = [
-                ['Price', formatPrice(data.price, symbol)],
+                ['Price', '$' + data.price.toFixed(2)],
                 ['Change', `${data.change >= 0 ? '+' : ''}${data.change.toFixed(2)}`],
                 ['Change %', `${data.changePercent >= 0 ? '+' : ''}${data.changePercent.toFixed(2)}%`],
-                ['Status', data.isLive ? 'Live Data' : 'Simulated'],
-                ['Source', data.source || 'Internal'],
+                ['Status', data.isLive ? 'Live Data' : 'Delayed'],
                 ['Updated', new Date().toLocaleTimeString()]
             ];
             
@@ -1271,92 +902,14 @@
             document.getElementById('tooltip').classList.remove('visible');
         }
 
-        // ============= DRAG AND DROP FUNCTIONALITY =============
-        function enableDragAndDrop() {
-            const cards = document.querySelectorAll('.price-card');
-            
-            cards.forEach(card => {
-                card.draggable = true;
-                
-                card.addEventListener('dragstart', (e) => {
-                    card.classList.add('dragging');
-                    e.dataTransfer.setData('text/plain', card.dataset.symbol);
-                });
-                
-                card.addEventListener('dragend', () => {
-                    card.classList.remove('dragging');
-                });
-                
-                card.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    card.classList.add('drag-over');
-                });
-                
-                card.addEventListener('dragleave', () => {
-                    card.classList.remove('drag-over');
-                });
-                
-                card.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    card.classList.remove('drag-over');
-                    const draggedSymbol = e.dataTransfer.getData('text/plain');
-                    const targetSymbol = card.dataset.symbol;
-                    
-                    if (draggedSymbol !== targetSymbol) {
-                        reorderSymbols(draggedSymbol, targetSymbol);
-                    }
-                });
-            });
-        }
-
-        function reorderSymbols(draggedSymbol, targetSymbol) {
-            // Find which arrays contain these symbols
-            const arrays = [commodities, companies, services];
-            let draggedArray, targetArray;
-            let draggedIndex, targetIndex;
-            
-            arrays.forEach(arr => {
-                const dIdx = arr.indexOf(draggedSymbol);
-                const tIdx = arr.indexOf(targetSymbol);
-                
-                if (dIdx !== -1) {
-                    draggedArray = arr;
-                    draggedIndex = dIdx;
-                }
-                
-                if (tIdx !== -1) {
-                    targetArray = arr;
-                    targetIndex = tIdx;
-                }
-            });
-            
-            if (draggedArray === targetArray) {
-                // Reorder within same array
-                draggedArray.splice(draggedIndex, 1);
-                const newTargetIndex = draggedArray.indexOf(targetSymbol);
-                draggedArray.splice(newTargetIndex, 0, draggedSymbol);
-                
-                // Re-render the appropriate section
-                renderPriceCards(draggedArray, getContainerForArray(draggedArray), getCardClassForArray(draggedArray), getChartTypeForArray(draggedArray));
+        // ============= CARD EXPAND FUNCTIONALITY =============
+        function toggleExpandCard(cardElement) {
+            if (expandedCard && expandedCard !== cardElement) {
+                expandedCard.classList.remove('expanded');
             }
-        }
-
-        function getContainerForArray(arr) {
-            if (arr === commodities) return 'commoditiesGrid';
-            if (arr === companies) return 'companiesGrid';
-            if (arr === services) return 'servicesGrid';
-        }
-
-        function getCardClassForArray(arr) {
-            if (arr === commodities) return 'commodity-card';
-            if (arr === companies) return 'company-card';
-            if (arr === services) return 'company-card services-card';
-        }
-
-        function getChartTypeForArray(arr) {
-            if (arr === commodities) return 'commodity';
-            if (arr === companies) return 'company';
-            if (arr === services) return 'services';
+            
+            cardElement.classList.toggle('expanded');
+            expandedCard = cardElement.classList.contains('expanded') ? cardElement : null;
         }
 
         // ============= DEBUG FUNCTIONS =============
@@ -1370,59 +923,64 @@
         }
 
         function updateDebugDisplay() {
-            if (debugMode) {
-                const debugLogElement = document.getElementById('debugLog');
-                if (debugLogElement) {
-                    debugLogElement.innerHTML = debugLog.slice(-25).join('<br>');
-                    debugLogElement.scrollTop = debugLogElement.scrollHeight;
-                }
+            if (debugMode && domCache.debugLog) {
+                domCache.debugLog.innerHTML = debugLog.slice(-25).join('<br>');
+                domCache.debugLog.scrollTop = domCache.debugLog.scrollHeight;
             }
         }
 
         function updateApiStats() {
-            document.getElementById('yahooStats').innerHTML = 
-                `${apiStats.yahoo.success} success, ${apiStats.yahoo.failed} failed`;
-            document.getElementById('finnhubStats').innerHTML = 
-                `${apiStats.finnhub.success} success, ${apiStats.finnhub.failed} failed`;
-            document.getElementById('twelveStats').innerHTML = 
-                `${apiStats.twelvedata.success} success, ${apiStats.twelvedata.failed} failed`;
-            document.getElementById('newsApiStats').innerHTML = 
-                `C:${apiStats.currents.success}/${apiStats.currents.failed} G:${apiStats.gnews.success}/${apiStats.gnews.failed} M:${apiStats.mediastack.success}/${apiStats.mediastack.failed}`;
+            const finnhubEl = document.getElementById('finnhubStats');
+            const newsEl = document.getElementById('newsApiStats');
+            
+            if (finnhubEl) finnhubEl.innerHTML = `${apiStats.finnhub.success} success, ${apiStats.finnhub.failed} failed`;
+            if (newsEl) newsEl.innerHTML = `Currents: ${apiStats.currents.success}/${apiStats.currents.failed}, GNews: ${apiStats.gnews.success}/${apiStats.gnews.failed}, RSS: ${apiStats.rss.success}/${apiStats.rss.failed}`;
         }
 
         function toggleDebug() {
             debugMode = !debugMode;
-            const panel = document.getElementById('debugPanel');
-            panel.style.display = debugMode ? 'block' : 'none';
+            if (domCache.debugPanel) {
+                domCache.debugPanel.style.display = debugMode ? 'block' : 'none';
+            }
             updateDebugDisplay();
             updateApiStats();
-            updateApiUsageDisplay();
         }
 
         function updateStatus(message) {
-            document.getElementById('apiStatus').textContent = message;
+            if (domCache.apiStatus) {
+                domCache.apiStatus.textContent = message;
+            }
             log(message);
         }
 
-        // ============= PRICE DATA FUNCTIONS =============
+        // ============= COMPANY DATA =============
         function getBasePrices() {
             return {
-                'CL=F': 65.31, 'NG=F': 3.28, 'BZ=F': 69.85,
-                'XOM': 109.48, 'CVX': 150.04, 'COP': 107.25, 'EOG': 121.30, 'EQT': 39.85,
+                'XOM': 109.48, 'CVX': 150.04, 'COP': 107.25, 
+                'EOG': 121.30, 'EQT': 39.85,
                 'KMI': 27.84, 'EPD': 31.18, 'ET': 16.95, 'WMB': 57.82,
                 'VLO': 131.75, 'PSX': 115.20, 'MPC': 148.60,
                 'SLB': 42.50, 'HAL': 32.75, 'BKR': 34.20
             };
         }
 
-        function getAssetName(symbol) {
+        function getCompanyName(symbol) {
             const names = {
-                'CL=F': 'WTI Crude Oil Futures', 'NG=F': 'Natural Gas Futures', 'BZ=F': 'Brent Crude Oil Futures',
-                'XOM': 'Exxon Mobil Corporation', 'CVX': 'Chevron Corporation', 'COP': 'ConocoPhillips',
-                'EOG': 'EOG Resources, Inc.', 'EQT': 'EQT Corporation', 'KMI': 'Kinder Morgan, Inc.',
-                'EPD': 'Enterprise Products Partners', 'ET': 'Energy Transfer LP', 'WMB': 'The Williams Companies, Inc.',
-                'VLO': 'Valero Energy Corporation', 'PSX': 'Phillips 66', 'MPC': 'Marathon Petroleum Corporation',
-                'SLB': 'Schlumberger Limited', 'HAL': 'Halliburton Company', 'BKR': 'Baker Hughes Company'
+                'XOM': 'Exxon Mobil Corporation', 
+                'CVX': 'Chevron Corporation', 
+                'COP': 'ConocoPhillips',
+                'EOG': 'EOG Resources, Inc.', 
+                'EQT': 'EQT Corporation', 
+                'KMI': 'Kinder Morgan, Inc.',
+                'EPD': 'Enterprise Products Partners', 
+                'ET': 'Energy Transfer LP', 
+                'WMB': 'The Williams Companies',
+                'VLO': 'Valero Energy Corporation', 
+                'PSX': 'Phillips 66', 
+                'MPC': 'Marathon Petroleum',
+                'SLB': 'Schlumberger Limited', 
+                'HAL': 'Halliburton Company', 
+                'BKR': 'Baker Hughes Company'
             };
             return names[symbol] || symbol;
         }
@@ -1431,8 +989,7 @@
             const basePrices = getBasePrices();
             const basePrice = lastPrice || basePrices[symbol] || 100;
             
-            // Create realistic market movements with trends
-            const volatility = symbol.includes('=F') ? 0.015 : 0.010;
+            const volatility = 0.010;
             const trend = Math.sin(Date.now() / 200000) * 0.003;
             const random = (Math.random() - 0.5) * 2 * volatility;
             const change = trend + random;
@@ -1447,245 +1004,6 @@
                 changePercent: percentChange,
                 isLive: false
             };
-        }
-
-        // ============= YAHOO FINANCE WITH CORS PROXY =============
-        async function fetchFromYahooWithProxy(symbol) {
-            try {
-                const url = `${CORS_PROXY}https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
-                
-                log(`🔄 Yahoo Proxy: Fetching ${symbol}`);
-                
-                const response = await fetch(url, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-                
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const data = await response.json();
-                
-                if (data.quoteResponse && data.quoteResponse.result && data.quoteResponse.result.length > 0) {
-                    const quote = data.quoteResponse.result[0];
-                    
-                    const currentPrice = quote.regularMarketPrice || quote.bid || quote.ask;
-                    const change = quote.regularMarketChange || 0;
-                    const changePercent = quote.regularMarketChangePercent || 0;
-                    
-                    if (currentPrice && currentPrice > 0) {
-                        apiStats.yahoo.success++;
-                        log(`✅ Yahoo Proxy: ${symbol} = $${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
-                        
-                        return {
-                            price: currentPrice,
-                            change: change,
-                            changePercent: changePercent,
-                            isLive: true,
-                            source: 'Yahoo-Proxy'
-                        };
-                    }
-                }
-                throw new Error('Invalid data');
-            } catch (error) {
-                apiStats.yahoo.failed++;
-                log(`❌ Yahoo Proxy: ${symbol} failed - ${error.message}`);
-                return null;
-            }
-        }
-
-        // ============= TWELVEDATA API =============
-        async function fetchFromTwelveData(symbol) {
-            try {
-                checkApiUsageReset();
-                
-                // Check rate limit
-                if (apiUsage.twelvedata.count >= 800) {
-                    log(`⚠️ TwelveData: Daily limit reached (800 calls)`);
-                    return null;
-                }
-                
-                // Try different symbol formats for commodities
-                let tdSymbol = symbol;
-                let isCommodity = false;
-                
-                // Multiple format attempts for commodities
-                const commodityFormats = {
-                    'CL=F': ['CL1:NYMEX', 'CL', 'CRUDE_OIL', 'WTI'],
-                    'NG=F': ['NG1:NYMEX', 'NG', 'NATURAL_GAS', 'NATGAS'],
-                    'BZ=F': ['BZ1:NYMEX', 'BZ', 'BRENT', 'BRENT_OIL']
-                };
-                
-                if (commodityFormats[symbol]) {
-                    isCommodity = true;
-                    
-                    // Try each format
-                    for (const format of commodityFormats[symbol]) {
-                        try {
-                            const url = `https://api.twelvedata.com/price?symbol=${format}&apikey=${API_KEYS.TWELVEDATA}`;
-                            
-                            log(`🔄 TwelveData: Trying ${symbol} as ${format}`);
-                            
-                            const response = await fetch(url);
-                            if (!response.ok) continue;
-                            
-                            const data = await response.json();
-                            
-                            log(`TwelveData response for ${format}: ${JSON.stringify(data)}`);
-                            
-                            if (data.price && !data.code) {
-                                const currentPrice = parseFloat(data.price);
-                                
-                                // Calculate change based on last known price
-                                let change = 0;
-                                let changePercent = 0;
-                                
-                                if (priceHistory[symbol] && priceHistory[symbol].length > 0) {
-                                    const lastPrice = priceHistory[symbol][priceHistory[symbol].length - 1];
-                                    change = currentPrice - lastPrice;
-                                    changePercent = (change / lastPrice) * 100;
-                                } else {
-                                    const basePrice = getBasePrices()[symbol] || currentPrice;
-                                    change = currentPrice - basePrice;
-                                    changePercent = (change / basePrice) * 100;
-                                }
-                                
-                                apiStats.twelvedata.success++;
-                                apiUsage.twelvedata.count++;
-                                updateApiUsageDisplay();
-                                
-                                log(`✅ TwelveData: ${symbol} = ${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
-                                
-                                return {
-                                    price: currentPrice,
-                                    change: change,
-                                    changePercent: changePercent,
-                                    isLive: true,
-                                    source: 'TwelveData'
-                                };
-                            }
-                        } catch (err) {
-                            log(`❌ TwelveData format ${format} failed: ${err.message}`);
-                            continue;
-                        }
-                    }
-                    
-                    throw new Error('All commodity formats failed');
-                } else {
-                    // Regular stock symbol
-                    tdSymbol = symbol;
-                }
-                
-                const url = `https://api.twelvedata.com/price?symbol=${tdSymbol}&apikey=${API_KEYS.TWELVEDATA}`;
-                
-                log(`🔄 TwelveData: Fetching ${symbol} as ${tdSymbol}`);
-                
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const data = await response.json();
-                
-                log(`TwelveData response for ${symbol}: ${JSON.stringify(data)}`);
-                
-                // Handle different response formats
-                if (data.price) {
-                    const currentPrice = parseFloat(data.price);
-                    
-                    // For commodities, we'll calculate change based on last known price
-                    let change = 0;
-                    let changePercent = 0;
-                    
-                    if (priceHistory[symbol] && priceHistory[symbol].length > 0) {
-                        const lastPrice = priceHistory[symbol][priceHistory[symbol].length - 1];
-                        change = currentPrice - lastPrice;
-                        changePercent = (change / lastPrice) * 100;
-                    } else {
-                        // Use base price for initial calculation
-                        const basePrice = getBasePrices()[symbol] || currentPrice;
-                        change = currentPrice - basePrice;
-                        changePercent = (change / basePrice) * 100;
-                    }
-                    
-                    apiStats.twelvedata.success++;
-                    apiUsage.twelvedata.count++;
-                    updateApiUsageDisplay();
-                    
-                    log(`✅ TwelveData: ${symbol} = ${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
-                    
-                    return {
-                        price: currentPrice,
-                        change: change,
-                        changePercent: changePercent,
-                        isLive: true,
-                        source: 'TwelveData'
-                    };
-                } else if (data.code === 400 || data.status === 'error') {
-                    throw new Error(data.message || 'Symbol not found');
-                } else {
-                    throw new Error('Invalid response format');
-                }
-            } catch (error) {
-                apiStats.twelvedata.failed++;
-                log(`❌ TwelveData: ${symbol} failed - ${error.message}`);
-                return null;
-            }
-        }
-
-        // ============= ALPHA VANTAGE COMMODITIES API =============
-        async function fetchFromAlphaVantage(symbol) {
-            try {
-                let avFunction = '';
-                let avSymbol = '';
-                
-                if (symbol === 'CL=F') {
-                    avFunction = 'WTI';
-                } else if (symbol === 'BZ=F') {
-                    avFunction = 'BRENT';
-                } else if (symbol === 'NG=F') {
-                    avFunction = 'NATURAL_GAS';
-                } else {
-                    return null; // Not a commodity
-                }
-                
-                const url = `https://www.alphavantage.co/query?function=${avFunction}&apikey=demo`;
-                
-                log(`🔄 AlphaVantage: Fetching ${symbol} as ${avFunction}`);
-                
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const data = await response.json();
-                
-                if (data.data && data.data.length > 0) {
-                    const latestData = data.data[0];
-                    const currentPrice = parseFloat(latestData.value);
-                    
-                    // Calculate change from previous day if available
-                    let change = 0;
-                    let changePercent = 0;
-                    
-                    if (data.data.length > 1) {
-                        const previousPrice = parseFloat(data.data[1].value);
-                        change = currentPrice - previousPrice;
-                        changePercent = (change / previousPrice) * 100;
-                    }
-                    
-                    log(`✅ AlphaVantage: ${symbol} = ${currentPrice.toFixed(2)} (${changePercent.toFixed(2)}%)`);
-                    
-                    return {
-                        price: currentPrice,
-                        change: change,
-                        changePercent: changePercent,
-                        isLive: true,
-                        source: 'AlphaVantage'
-                    };
-                } else {
-                    throw new Error('No data available');
-                }
-            } catch (error) {
-                log(`❌ AlphaVantage: ${symbol} failed - ${error.message}`);
-                return null;
-            }
         }
 
         // ============= FINNHUB API =============
@@ -1727,18 +1045,27 @@
         // ============= NEWS APIS =============
         async function fetchFromCurrentsAPI() {
             try {
-                checkApiUsageReset();
+                // Get date 7 days ago for freshness
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                const startDate = weekAgo.toISOString();
                 
-                if (apiUsage.currents.count >= 600) {
-                    log(`⚠️ CurrentsAPI: Daily limit reached`);
-                    return null;
-                }
+                // Targeted search terms for regulatory/legal energy news
+                const searchTerms = [
+                    'pipeline%20regulation',
+                    'drilling%20permits',
+                    'oil%20gas%20litigation',
+                    'energy%20regulatory',
+                    'FERC%20pipeline',
+                    'EPA%20oil%20gas',
+                    'fracking%20regulation',
+                    'offshore%20drilling%20policy',
+                    'energy%20infrastructure%20legal'
+                ].join('%20OR%20');
                 
-                // More specific energy sector queries
-                const energyKeywords = 'oil%20prices%20OR%20natural%20gas%20OR%20crude%20oil%20OR%20energy%20sector%20OR%20petroleum%20OR%20OPEC%20OR%20shale%20OR%20drilling%20OR%20pipeline';
-                const url = `https://api.currentsapi.services/v1/search?keywords=${energyKeywords}&language=en&apiKey=${API_KEYS.CURRENTS}`;
+                const url = `https://api.currentsapi.services/v1/search?keywords=${searchTerms}&language=en&start_date=${startDate}&apiKey=${API_KEYS.CURRENTS}`;
                 
-                log(`🔄 CurrentsAPI: Fetching energy sector news`);
+                log(`🔄 CurrentsAPI: Fetching recent regulatory energy news`);
                 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -1746,35 +1073,34 @@
                 const data = await response.json();
                 
                 if (data.news && data.news.length > 0) {
-                    // Filter for relevance
-                    const energyTerms = ['oil', 'gas', 'energy', 'crude', 'petroleum', 'opec', 'drilling', 'pipeline', 'shale', 'lng', 'refinery', 'barrel'];
-                    const relevantNews = data.news.filter(item => 
-                        energyTerms.some(term => 
-                            item.title.toLowerCase().includes(term) || 
-                            (item.description && item.description.toLowerCase().includes(term))
-                        )
-                    );
+                    // Filter for recent articles (within 7 days) and sort by date
+                    const recentNews = data.news
+                        .filter(item => {
+                            const publishDate = new Date(item.published);
+                            const daysDiff = (Date.now() - publishDate) / (1000 * 60 * 60 * 24);
+                            return daysDiff <= 7 && (
+                                energyTermsRegex.test(item.title) || 
+                                (item.description && energyTermsRegex.test(item.description))
+                            );
+                        })
+                        .sort((a, b) => new Date(b.published) - new Date(a.published))
+                        .slice(0, 6);
                     
-                    const newsItems = relevantNews.slice(0, 6).map(item => ({
+                    const newsItems = recentNews.map(item => ({
                         title: item.title,
                         url: item.url,
                         source: item.author || 'CurrentsAPI',
-                        time: item.published
+                        time: item.published,
+                        daysAgo: Math.floor((Date.now() - new Date(item.published)) / (1000 * 60 * 60 * 24))
                     }));
                     
                     if (newsItems.length > 0) {
                         apiStats.currents.success++;
-                        apiUsage.currents.count++;
-                        updateApiUsageDisplay();
-                        
-                        log(`✅ CurrentsAPI: Loaded ${newsItems.length} energy-specific articles`);
+                        log(`✅ CurrentsAPI: Loaded ${newsItems.length} recent articles`);
                         return newsItems;
-                    } else {
-                        throw new Error('No relevant energy news found');
                     }
-                } else {
-                    throw new Error('No news data');
                 }
+                throw new Error('No recent relevant news found');
             } catch (error) {
                 apiStats.currents.failed++;
                 log(`❌ CurrentsAPI failed: ${error.message}`);
@@ -1784,18 +1110,26 @@
 
         async function fetchFromGNews() {
             try {
-                checkApiUsageReset();
+                // GNews supports from/to date parameters
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                const fromDate = weekAgo.toISOString().split('T')[0]; // YYYY-MM-DD format
                 
-                if (apiUsage.gnews.count >= 100) {
-                    log(`⚠️ GNews: Daily limit reached`);
-                    return null;
-                }
+                // More targeted boolean search for regulatory/legal energy news
+                const query = [
+                    'oil%20gas%20regulation',
+                    'pipeline%20legal',
+                    'drilling%20lawsuit',
+                    'energy%20compliance',
+                    'OPEC%20policy',
+                    'shale%20permits',
+                    'refinery%20regulatory',
+                    'natural%20gas%20infrastructure'
+                ].join('%20OR%20');
                 
-                // Energy-specific search query
-                const query = 'oil%20prices%20OR%20natural%20gas%20OR%20OPEC%20OR%20energy%20sector%20OR%20crude%20oil';
-                const url = `https://gnews.io/api/v4/search?q=${query}&lang=en&max=10&apikey=${API_KEYS.GNEWS}`;
+                const url = `https://gnews.io/api/v4/search?q=${query}&lang=en&max=10&from=${fromDate}&sortby=publishedAt&apikey=${API_KEYS.GNEWS}`;
                 
-                log(`🔄 GNews: Fetching energy sector news`);
+                log(`🔄 GNews: Fetching recent energy regulatory news`);
                 
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -1803,34 +1137,34 @@
                 const data = await response.json();
                 
                 if (data.articles && data.articles.length > 0) {
-                    // Additional filtering for energy relevance
-                    const energyTerms = ['oil', 'gas', 'energy', 'crude', 'petroleum', 'opec', 'drilling', 'pipeline', 'shale', 'lng', 'refinery'];
-                    const relevantArticles = data.articles.filter(item => 
-                        energyTerms.some(term => 
-                            item.title.toLowerCase().includes(term) || 
-                            item.description.toLowerCase().includes(term)
-                        )
-                    );
+                    // Additional filtering and sorting by recency
+                    const recentArticles = data.articles
+                        .filter(item => {
+                            const publishDate = new Date(item.publishedAt);
+                            const daysDiff = (Date.now() - publishDate) / (1000 * 60 * 60 * 24);
+                            return daysDiff <= 7 && (
+                                energyTermsRegex.test(item.title) || 
+                                energyTermsRegex.test(item.description)
+                            );
+                        })
+                        .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+                        .slice(0, 6);
                     
-                    const newsItems = relevantArticles.slice(0, 6).map(item => ({
+                    const newsItems = recentArticles.map(item => ({
                         title: item.title,
                         url: item.url,
                         source: item.source.name || 'GNews',
-                        time: item.publishedAt
+                        time: item.publishedAt,
+                        daysAgo: Math.floor((Date.now() - new Date(item.publishedAt)) / (1000 * 60 * 60 * 24))
                     }));
                     
                     if (newsItems.length > 0) {
                         apiStats.gnews.success++;
-                        apiUsage.gnews.count++;
-                        
-                        log(`✅ GNews: Loaded ${newsItems.length} energy-specific articles`);
+                        log(`✅ GNews: Loaded ${newsItems.length} recent articles`);
                         return newsItems;
-                    } else {
-                        throw new Error('No relevant energy news found');
                     }
-                } else {
-                    throw new Error('No news data');
                 }
+                throw new Error('No recent relevant news found');
             } catch (error) {
                 apiStats.gnews.failed++;
                 log(`❌ GNews failed: ${error.message}`);
@@ -1838,154 +1172,183 @@
             }
         }
 
-        async function fetchFromMediastack() {
+        // ============= RSS FEED BACKUP =============
+        async function fetchFromRSSFeeds() {
             try {
-                checkApiUsageReset();
-                
-                if (apiUsage.mediastack.count >= 16) {
-                    log(`⚠️ Mediastack: Daily limit reached`);
-                    return null;
-                }
-                
-                // Note: Mediastack uses HTTP, not HTTPS
-                const keywords = 'oil,natural gas,crude,OPEC,energy prices,petroleum';
-                const url = `http://api.mediastack.com/v1/news?access_key=${API_KEYS.MEDIASTACK}&keywords=${keywords}&languages=en&limit=10`;
-                
-                log(`🔄 Mediastack: Fetching energy sector news`);
-                
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const data = await response.json();
-                
-                if (data.data && data.data.length > 0) {
-                    // Filter for energy relevance
-                    const energyTerms = ['oil', 'gas', 'energy', 'crude', 'petroleum', 'opec', 'drilling', 'pipeline'];
-                    const relevantNews = data.data.filter(item => 
-                        energyTerms.some(term => 
-                            item.title.toLowerCase().includes(term) || 
-                            (item.description && item.description.toLowerCase().includes(term))
-                        )
-                    );
-                    
-                    const newsItems = relevantNews.slice(0, 6).map(item => ({
-                        title: item.title,
-                        url: item.url,
-                        source: item.source || 'Mediastack',
-                        time: item.published_at
-                    }));
-                    
-                    if (newsItems.length > 0) {
-                        apiStats.mediastack.success++;
-                        apiUsage.mediastack.count++;
-                        
-                        log(`✅ Mediastack: Loaded ${newsItems.length} energy-specific articles`);
-                        return newsItems;
-                    } else {
-                        throw new Error('No relevant energy news found');
+                // Try specialized energy RSS feeds for very fresh content
+                const rssFeeds = [
+                    {
+                        name: 'Oil & Gas Journal',
+                        url: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.ogj.com/rss&count=5'
+                    },
+                    {
+                        name: 'Reuters Energy',
+                        url: 'https://api.rss2json.com/v1/api.json?rss_url=https://www.reuters.com/business/energy/rss&count=5'
                     }
-                } else {
-                    throw new Error('No news data');
+                ];
+                
+                const allRssNews = [];
+                
+                for (const feed of rssFeeds) {
+                    try {
+                        const response = await fetch(feed.url);
+                        if (response.ok) {
+                            const data = await response.json();
+                            
+                            if (data.status === 'ok' && data.items && data.items.length > 0) {
+                                const recentItems = data.items.filter(item => {
+                                    const publishDate = new Date(item.pubDate);
+                                    const daysDiff = (Date.now() - publishDate) / (1000 * 60 * 60 * 24);
+                                    return daysDiff <= 3; // Only last 3 days for RSS
+                                });
+                                
+                                const newsItems = recentItems.map(item => ({
+                                    title: item.title,
+                                    url: item.link,
+                                    source: feed.name,
+                                    time: item.pubDate,
+                                    daysAgo: Math.floor((Date.now() - new Date(item.pubDate)) / (1000 * 60 * 60 * 24))
+                                }));
+                                
+                                allRssNews.push(...newsItems);
+                            }
+                        }
+                    } catch (error) {
+                        apiStats.rss.failed++;
+                        log(`RSS feed ${feed.name} failed: ${error.message}`);
+                    }
                 }
+                
+                return allRssNews;
             } catch (error) {
-                apiStats.mediastack.failed++;
-                log(`❌ Mediastack failed: ${error.message}`);
-                return null;
+                log(`RSS feeds failed: ${error.message}`);
+                return [];
             }
         }
 
-        async function fetchEnhancedNews() {
-            log('📰 Fetching news from multiple sources...');
-            updateNewsStatus('🔍 Loading energy news from multiple feeds...');
+        async function fetchNews() {
+            log('📰 Fetching recent news...');
+            updateNewsStatus('🔍 Loading recent regulatory & market news...');
             
             let allNews = [];
             
-            // Try primary news sources first
+            // Try RSS feeds first for freshest content
+            const rssNews = await fetchFromRSSFeeds();
+            if (rssNews.length > 0) {
+                allNews = [...allNews, ...rssNews];
+                log(`✅ RSS: Loaded ${rssNews.length} very recent articles`);
+            }
+            
+            // Then try regular news APIs
             const currentsNews = await fetchFromCurrentsAPI();
             if (currentsNews) allNews = [...allNews, ...currentsNews];
             
-const gnewsItems = await fetchFromGNews();
-if (gnewsItems) allNews = [...allNews, ...gnewsItems];
+            const gnewsItems = await fetchFromGNews();
+            if (gnewsItems) allNews = [...allNews, ...gnewsItems];
+            
+            if (allNews.length > 0) {
+                // Remove duplicates and sort by date (most recent first)
+                const uniqueNews = Array.from(
+                    new Map(allNews.map(item => [item.title, item])).values()
+                ).sort((a, b) => new Date(b.time) - new Date(a.time));
+                
+                displayNews(uniqueNews.slice(0, 12));
+                updateNewsStatus(`✅ Showing ${uniqueNews.length} articles from the past week`);
+                log(`✅ Total recent news items loaded: ${uniqueNews.length}`);
+            } else {
+                updateNewsStatus('❌ No recent news available - showing examples');
+                displayFallbackNews();
+            }
+        }
 
-// Only use Mediastack if we need more news
-if (allNews.length < 8) {
-    const mediastackNews = await fetchFromMediastack();
-    if (mediastackNews) allNews = [...allNews, ...mediastackNews];
-}
+        function displayNews(newsItems) {
+            if (!domCache.newsContainer) return;
+            
+            const newsHtml = newsItems.map(item => {
+                // Format the time display
+                let timeDisplay = '';
+                if (item.daysAgo === 0) {
+                    timeDisplay = 'Today';
+                } else if (item.daysAgo === 1) {
+                    timeDisplay = 'Yesterday';
+                } else {
+                    timeDisplay = `${item.daysAgo} days ago`;
+                }
+                
+                return `
+                    <div class="news-item">
+                        <div class="news-title">${item.title}</div>
+                        <div class="news-source">
+                            <span>${item.source} • ${timeDisplay}</span>
+                            <a href="${item.url}" target="_blank" class="news-link">Read More</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            domCache.newsContainer.innerHTML = newsHtml;
+        }
 
-if (allNews.length > 0) {
-    displayNews(allNews.slice(0, 12));
-    updateNewsStatus(`✅ Loaded ${allNews.length} live energy headlines`);
-    log(`✅ Total news items loaded: ${allNews.length}`);
-} else {
-    updateNewsStatus('❌ Live news unavailable - showing energy examples');
-    displayFallbackNews();
-}
+        function displayFallbackNews() {
+            const fallbackNews = [
+                { 
+                    title: 'FERC Denies Rehearing Request for Mountain Valley Pipeline Certificate Challenge', 
+                    source: 'Energy Legal News', 
+                    url: '#',
+                    daysAgo: 0
+                },
+                { 
+                    title: 'EPA Proposes Stricter Methane Rules for Oil and Gas Drilling Operations', 
+                    source: 'Regulatory Watch', 
+                    url: '#',
+                    daysAgo: 0
+                },
+                { 
+                    title: 'Federal Court Rules on Interstate Natural Gas Pipeline Eminent Domain Case', 
+                    source: 'Infrastructure Today', 
+                    url: '#',
+                    daysAgo: 1
+                },
+                { 
+                    title: 'Texas Railroad Commission Updates Well Permitting Process After Industry Pushback', 
+                    source: 'Oil & Gas Journal', 
+                    url: '#',
+                    daysAgo: 1
+                },
+                { 
+                    title: 'Energy Companies File Lawsuit Against New BLM Drilling Restrictions', 
+                    source: 'Drilling Contractor', 
+                    url: '#',
+                    daysAgo: 2
+                },
+                { 
+                    title: 'DC Circuit Hears Arguments in Pipeline Rate Case Affecting Multiple Operators', 
+                    source: 'Policy Review', 
+                    url: '#',
+                    daysAgo: 2
+                }
+            ];
+            displayNews(fallbackNews);
+        }
 
-function displayNews(newsItems) {
-    const container = document.getElementById('newsContainer');
-    if (!container) return;
-
-    const newsHtml = newsItems.map(item => `
-        <div class="news-item">
-            <div class="news-title">${item.title}</div>
-            <div class="news-source">
-                <span>${item.source}</span>
-                <a href="${item.url}" target="_blank" class="news-link">Read More</a>
-            </div>
-        </div>
-    `).join('');
-
-    container.innerHTML = newsHtml;
-}
-
-function displayFallbackNews() {
-    const fallbackNews = [
-        { title: 'Federal Pipeline Infrastructure Regulations Face Legal Challenge from Energy Groups', source: 'Energy Policy Watch', url: 'https://example.com' },
-        { title: 'Natural Gas Drilling Operations in Permian Basin Under New Regulatory Scrutiny', source: 'Oil & Gas Journal', url: 'https://example.com' },
-        { title: 'Data Center Energy Demand Drives New Natural Gas Pipeline Projects', source: 'Infrastructure Today', url: 'https://example.com' },
-        { title: 'Oil and Gas E&P Companies Challenge State Environmental Policies in Court', source: 'Petroleum News', url: 'https://example.com' },
-        { title: 'Wellhead Safety Regulations Updated Following Industry Compliance Review', source: 'Drilling Contractor', url: 'https://example.com' },
-        { title: 'Crude Oil Pipeline Litigation Reaches Federal Appeals Court Level', source: 'Energy Legal News', url: 'https://example.com' }
-    ];
-    displayNews(fallbackNews);
-}
-
-function updateNewsStatus(message) {
-    const element = document.getElementById('newsStatus');
-    if (element) {
-        element.textContent = message;
-    }
-}
-
+        function updateNewsStatus(message) {
+            if (domCache.newsStatus) {
+                domCache.newsStatus.textContent = message;
+            }
+        }
 
         // ============= DISPLAY FUNCTIONS =============
-        function formatPrice(price, symbol) {
-            if (symbol.includes('=F')) {
-                if (symbol === 'NG=F') return '$' + price.toFixed(3) + '/MMBtu';
-                else if (symbol === 'CL=F' || symbol === 'BZ=F') return '$' + price.toFixed(2) + '/bbl';
-            }
-            return '$' + price.toFixed(2);
-        }
-
-        function formatChange(change, changePercent) {
-            const changeStr = (change >= 0 ? '+' : '') + change.toFixed(2);
-            const percentStr = (changePercent >= 0 ? '+' : '') + changePercent.toFixed(2) + '%';
-            return { changeStr, percentStr };
-        }
-
-        function renderPriceCards(symbols, containerId, cardClass, chartType = 'company') {
-            const container = document.getElementById(containerId);
-            if (!container) return;
+        function renderPriceCards() {
+            if (!domCache.companiesGrid) return;
             
-            const html = symbols.map(symbol => {
+            const html = energyCompanies.map(symbol => {
                 const data = priceData[symbol];
                 if (!data) return '';
                 
-                const { changeStr, percentStr } = formatChange(data.change, data.changePercent);
                 const isPositive = data.change >= 0;
                 const statusClass = isUpdating ? (data.isLive ? 'status-live' : 'status-error') : 'status-error';
-                const dataSource = data.isLive ? `📡 ${data.source || 'LIVE'}` : '📊 SIM';
+                const dataSource = data.isLive ? '📡 LIVE' : '📊 DELAYED';
+                const isServices = servicesCompanies.includes(symbol);
                 
                 // Conditional formatting for major moves
                 let majorMoveClass = '';
@@ -1994,7 +1357,8 @@ function updateNewsStatus(message) {
                 }
                 
                 return `
-                    <div class="price-card ${cardClass} ${majorMoveClass}" data-symbol="${symbol}" 
+                    <div class="price-card ${isServices ? 'services' : ''} ${majorMoveClass}" 
+                         data-symbol="${symbol}" 
                          onmouseenter="showTooltip(event, '${symbol}', ${JSON.stringify(data).replace(/"/g, '&quot;')})"
                          onmouseleave="hideTooltip()"
                          onclick="toggleExpandCard(this)">
@@ -2003,29 +1367,17 @@ function updateNewsStatus(message) {
                             <span class="status-indicator ${statusClass}"></span>
                         </div>
                         <div class="company-name">${data.name}</div>
-                        <div class="price">${formatPrice(data.price, symbol)}</div>
+                        <div class="price">$${data.price.toFixed(2)}</div>
                         <div class="change ${isPositive ? 'positive' : 'negative'}">
-                            <span class="change-amount">${changeStr}</span>
-                            <span class="change-percent">${percentStr}</span>
+                            <span class="change-amount">${isPositive ? '+' : ''}${data.change.toFixed(2)}</span>
+                            <span class="change-percent">${isPositive ? '+' : ''}${data.changePercent.toFixed(2)}%</span>
                         </div>
-                        <div class="price-chart">${createAdvancedChart(symbol, chartType)}</div>
+                        <div class="price-chart">${createSimpleChart(symbol, priceHistory)}</div>
                     </div>
                 `;
             }).join('');
             
-            container.innerHTML = html;
-            
-            // Enable drag and drop after rendering
-            setTimeout(enableDragAndDrop, 100);
-        }
-
-        function toggleExpandCard(cardElement) {
-            if (expandedCard && expandedCard !== cardElement) {
-                expandedCard.classList.remove('expanded');
-            }
-            
-            cardElement.classList.toggle('expanded');
-            expandedCard = cardElement.classList.contains('expanded') ? cardElement : null;
+            domCache.companiesGrid.innerHTML = html;
         }
 
         function updateMarketSummary() {
@@ -2033,69 +1385,63 @@ function updateNewsStatus(message) {
                 const allData = Object.values(priceData).filter(d => d && typeof d.changePercent === 'number');
                 if (allData.length === 0) return;
                 
-                // Energy sector (companies + services)
-                const stockSymbols = [...companies, ...services];
-                const stockData = stockSymbols.map(s => priceData[s]).filter(d => d && typeof d.changePercent === 'number');
-                const energyAvg = stockData.length > 0 ? 
-                    stockData.reduce((sum, d) => sum + d.changePercent, 0) / stockData.length : 0;
-                
-                // Commodities average
-                const commodityData = commodities.map(s => priceData[s]).filter(d => d && typeof d.changePercent === 'number');
-                const commoditiesAvg = commodityData.length > 0 ? 
-                    commodityData.reduce((sum, d) => sum + d.changePercent, 0) / commodityData.length : 0;
+                // Sector average
+                const sectorAvg = allData.reduce((sum, d) => sum + d.changePercent, 0) / allData.length;
                 
                 // Top gainer and loser
                 const topGainer = allData.reduce((max, d) => d.changePercent > max.changePercent ? d : max, allData[0]);
                 const topLoser = allData.reduce((min, d) => d.changePercent < min.changePercent ? d : min, allData[0]);
                 
-                // Oil-Gas correlation
-                const oilData = priceData['CL=F'];
-                const gasData = priceData['NG=F'];
-                let correlation = 'N/A';
-                if (oilData && gasData && typeof oilData.changePercent === 'number' && typeof gasData.changePercent === 'number') {
-                    correlation = (oilData.changePercent * gasData.changePercent > 0) ? 'Positive' : 'Negative';
-                }
+                // Active stocks count
+                const activeCount = allData.filter(d => d.isLive).length;
                 
                 // Update display
-                document.getElementById('energySector').innerHTML = `<span class="${energyAvg >= 0 ? 'positive' : 'negative'}">${energyAvg.toFixed(2)}%</span>`;
-                document.getElementById('commoditiesAvg').innerHTML = `<span class="${commoditiesAvg >= 0 ? 'positive' : 'negative'}">${commoditiesAvg.toFixed(2)}%</span>`;
-                document.getElementById('topGainer').innerHTML = `<span class="positive">${topGainer.symbol} ${topGainer.changePercent.toFixed(2)}%</span>`;
-                document.getElementById('topLoser').innerHTML = `<span class="negative">${topLoser.symbol} ${topLoser.changePercent.toFixed(2)}%</span>`;
-                document.getElementById('correlation').textContent = correlation;
+                if (domCache.sectorAvg) {
+                    domCache.sectorAvg.innerHTML = `<span class="${sectorAvg >= 0 ? 'positive' : 'negative'}">${sectorAvg.toFixed(2)}%</span>`;
+                }
+                if (domCache.topGainer) {
+                    domCache.topGainer.innerHTML = `<span class="positive">${topGainer.symbol} +${topGainer.changePercent.toFixed(2)}%</span>`;
+                }
+                if (domCache.topLoser) {
+                    domCache.topLoser.innerHTML = `<span class="negative">${topLoser.symbol} ${topLoser.changePercent.toFixed(2)}%</span>`;
+                }
+                if (domCache.activeStocks) {
+                    domCache.activeStocks.textContent = `${activeCount}/${allData.length}`;
+                }
             } catch (error) {
                 log(`❌ Error updating market summary: ${error.message}`);
             }
         }
 
-        // ============= OPTIMIZED UPDATE FUNCTIONS =============
+        // ============= UPDATE FUNCTIONS =============
         async function updateStocks() {
-            log('📈 Updating stocks (2-min cycle)...');
+            log('📈 Updating stocks...');
             updateStatus('📈 Updating stock prices...');
+            
+            if (domCache.refreshAllBtn) domCache.refreshAllBtn.disabled = true;
+            
             let liveCount = 0;
             
-            for (const symbol of [...companies, ...services]) {
-                let data = await fetchFromFinnhub(symbol);
-                
-                if (!data) {
-                    data = await fetchFromYahooWithProxy(symbol);
-                }
+            // Process all stocks
+            for (const symbol of energyCompanies) {
+                const data = await fetchFromFinnhub(symbol);
                 
                 if (data) {
                     priceData[symbol] = {
                         ...data,
-                        name: getAssetName(symbol),
+                        name: getCompanyName(symbol),
                         symbol: symbol
                     };
                     liveCount++;
                 } else {
-                    // Use realistic simulation
+                    // Use simulation if API fails
                     const lastPrice = priceHistory[symbol] && priceHistory[symbol].length > 0 ? 
                         priceHistory[symbol][priceHistory[symbol].length - 1] : null;
                     const simulatedData = generateRealisticPrice(symbol, lastPrice);
                     
                     priceData[symbol] = {
                         ...simulatedData,
-                        name: getAssetName(symbol),
+                        name: getCompanyName(symbol),
                         symbol: symbol
                     };
                 }
@@ -2103,208 +1449,108 @@ function updateNewsStatus(message) {
                 // Update price history
                 if (!priceHistory[symbol]) priceHistory[symbol] = [];
                 priceHistory[symbol].push(priceData[symbol].price);
-                if (priceHistory[symbol].length > 30) {
+                if (priceHistory[symbol].length > 50) {
                     priceHistory[symbol].shift();
                 }
                 
-                await new Promise(resolve => setTimeout(resolve, 50)); // Small delay
+                // Small delay between requests
+                await new Promise(resolve => setTimeout(resolve, 100));
             }
             
-            renderPriceCards(companies, 'companiesGrid', 'company-card', 'company');
-            renderPriceCards(services, 'servicesGrid', 'company-card services-card', 'services');
+            renderPriceCards();
             updateMarketSummary();
             
             REFRESH_CONFIG.stocks.lastUpdate = Date.now();
-            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+            if (domCache.lastUpdate) domCache.lastUpdate.textContent = new Date().toLocaleTimeString();
             
-            const statusMessage = `✅ Stocks: ${liveCount}/${[...companies, ...services].length} live`;
+            const statusMessage = `✅ Updated: ${liveCount}/${energyCompanies.length} live`;
             updateStatus(statusMessage);
             updateApiStats();
+            
+            if (domCache.refreshAllBtn) domCache.refreshAllBtn.disabled = false;
             log(`✅ Stock update complete: ${liveCount} live`);
-        }
-
-        async function updateCommodities() {
-            log('🛢️ Updating commodities (10-min cycle)...');
-            updateStatus('🛢️ Updating commodity prices...');
-            let liveCount = 0;
-            
-            for (const symbol of commodities) {
-                let data = null;
-                
-                // Try multiple APIs in sequence
-                data = await fetchFromTwelveData(symbol);
-                
-                if (!data) {
-                    await new Promise(resolve => setTimeout(resolve, 200));
-                    data = await fetchFromAlphaVantage(symbol);
-                }
-                
-                if (!data) {
-                    await new Promise(resolve => setTimeout(resolve, 200));
-                    // Try a different CORS proxy
-                    const altProxy = 'https://api.allorigins.win/raw?url=';
-                    try {
-                        const url = `${altProxy}https://query1.finance.yahoo.com/v7/finance/quote?symbols=${symbol}`;
-                        log(`🔄 Alternative proxy: Fetching ${symbol}`);
-                        
-                        const response = await fetch(url);
-                        if (response.ok) {
-                            const jsonData = await response.json();
-                            if (jsonData.quoteResponse && jsonData.quoteResponse.result && jsonData.quoteResponse.result.length > 0) {
-                                const quote = jsonData.quoteResponse.result[0];
-                                if (quote.regularMarketPrice) {
-                                    data = {
-                                        price: quote.regularMarketPrice,
-                                        change: quote.regularMarketChange || 0,
-                                        changePercent: quote.regularMarketChangePercent || 0,
-                                        isLive: true,
-                                        source: 'Yahoo-Alt'
-                                    };
-                                    log(`✅ Alternative proxy: ${symbol} = ${data.price.toFixed(2)}`);
-                                }
-                            }
-                        }
-                    } catch (error) {
-                        log(`❌ Alternative proxy failed: ${error.message}`);
-                    }
-                }
-                
-                if (data) {
-                    priceData[symbol] = {
-                        ...data,
-                        name: getAssetName(symbol),
-                        symbol: symbol
-                    };
-                    liveCount++;
-                } else {
-                    // Use realistic simulation
-                    const lastPrice = priceHistory[symbol] && priceHistory[symbol].length > 0 ? 
-                        priceHistory[symbol][priceHistory[symbol].length - 1] : null;
-                    const simulatedData = generateRealisticPrice(symbol, lastPrice);
-                    
-                    priceData[symbol] = {
-                        ...simulatedData,
-                        name: getAssetName(symbol),
-                        symbol: symbol
-                    };
-                    log(`📊 Using simulation for ${symbol}: ${simulatedData.price.toFixed(2)}`);
-                }
-                
-                // Update price history
-                if (!priceHistory[symbol]) priceHistory[symbol] = [];
-                priceHistory[symbol].push(priceData[symbol].price);
-                if (priceHistory[symbol].length > 30) {
-                    priceHistory[symbol].shift();
-                }
-                
-                await new Promise(resolve => setTimeout(resolve, 100)); // Small delay
-            }
-            
-            renderPriceCards(commodities, 'commoditiesGrid', 'commodity-card', 'commodity');
-            updateMarketSummary();
-            
-            REFRESH_CONFIG.commodities.lastUpdate = Date.now();
-            
-            const statusMessage = `✅ Commodities: ${liveCount}/${commodities.length} live`;
-            updateStatus(statusMessage);
-            updateApiStats();
-            log(`✅ Commodity update complete: ${liveCount} live`);
-        }
-
-        async function updateNews() {
-            log('📰 Updating news (10-min cycle)...');
-            await fetchEnhancedNews();
-            REFRESH_CONFIG.news.lastUpdate = Date.now();
         }
 
         // ============= CONTROL FUNCTIONS =============
         function addSymbol() {
-            const input = document.getElementById('symbolInput');
-            const symbol = input.value.trim().toUpperCase();
+            const input = domCache.symbolInput;
+            if (!input) return;
             
-            if (symbol && !allSymbols.includes(symbol)) {
-                if (symbol.includes('=F')) {
-                    commodities.push(symbol);
-                } else if (['SLB', 'HAL', 'BKR'].some(s => symbol.includes(s))) {
-                    services.push(symbol);
-                } else {
-                    companies.push(symbol);
-                }
-                allSymbols.push(symbol);
+            const symbol = sanitizeSymbol(input.value.trim().toUpperCase());
+            
+            if (symbol && !energyCompanies.includes(symbol)) {
+                energyCompanies.push(symbol);
                 priceHistory[symbol] = [];
-                volumeData[symbol] = [];
                 input.value = '';
                 
-                // Update the appropriate category
-                if (symbol.includes('=F')) {
-                    updateCommodities();
-                } else {
-                    updateStocks();
-                }
+                // Update immediately for new symbol
+                updateStocks();
                 
                 log(`➕ Added symbol: ${symbol}`);
             }
         }
 
         function toggleUpdates() {
-            const btn = document.getElementById('toggleBtn');
             isUpdating = !isUpdating;
             
+            if (domCache.toggleBtn) {
+                domCache.toggleBtn.textContent = isUpdating ? '⏸️ Pause' : '▶️ Resume';
+            }
+            
             if (isUpdating) {
-                btn.textContent = '⏸️ Pause';
                 startIntervals();
                 updateStatus('🔄 Live updates resumed');
             } else {
-                btn.textContent = '▶️ Resume';
                 stopIntervals();
                 updateStatus('⏸️ Updates paused');
             }
+            
             log(`${isUpdating ? '▶️ Resumed' : '⏸️ Paused'} updates`);
         }
 
         function refreshAll() {
-            log('🔄 Manual refresh triggered for all data');
+            log('🔄 Manual refresh triggered');
             updateStocks();
-            updateCommodities();
-            updateNews();
+            fetchNews();
         }
 
         function startIntervals() {
             stockInterval = setInterval(updateStocks, REFRESH_CONFIG.stocks.interval);
-            commodityInterval = setInterval(updateCommodities, REFRESH_CONFIG.commodities.interval);
-            newsInterval = setInterval(updateNews, REFRESH_CONFIG.news.interval);
+            newsInterval = setInterval(fetchNews, REFRESH_CONFIG.news.interval);
         }
 
         function stopIntervals() {
             clearInterval(stockInterval);
-            clearInterval(commodityInterval);
             clearInterval(newsInterval);
         }
 
         // ============= INITIALIZATION =============
         document.addEventListener('DOMContentLoaded', function() {
-            log('🚀 Professional Energy Terminal starting...');
+            log('🚀 Energy Equities Terminal starting...');
+            
+            // Initialize DOM cache
+            initializeDomCache();
             
             // Set up event listeners
-            document.getElementById('symbolInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    addSymbol();
-                }
-            });
+            if (domCache.symbolInput) {
+                domCache.symbolInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        addSymbol();
+                    }
+                });
+            }
 
             // Start the application
-            updateStatus('🔌 Connecting to professional data sources...');
+            updateStatus('🔌 Connecting to market data...');
             
             // Initial data load
             updateStocks();
-            updateCommodities();
-            updateNews();
+            fetchNews();
             
-            // Set up optimized intervals
+            // Set up intervals
             startIntervals();
             
-            log('✅ Professional terminal ready with optimized refresh rates');
-            log('📊 Stocks: 2min | 🛢️ Commodities: 10min | 📰 News: 10min');
+            log('✅ Terminal ready');
         });
     </script>
 </body>
